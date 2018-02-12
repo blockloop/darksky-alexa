@@ -2,38 +2,8 @@
 
 
 [[projects]]
-  name = "github.com/apex/log"
-  packages = ["."]
-  revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/blockloop/tea"
-  packages = ["."]
-  revision = "246ee39990da57bcb2773211f6d0f593d88145b6"
-
-[[projects]]
-  name = "github.com/caarlos0/env"
-  packages = ["."]
-  revision = "7cd7992b3bc86f920394f8de92c13900da1a46b7"
-  version = "v3.2.0"
-
-[[projects]]
-  name = "github.com/garyburd/redigo"
-  packages = [
-    "internal",
-    "redis"
-  ]
-  revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
-  version = "v1.4.0"
-
-[[projects]]
   name = "github.com/go-chi/chi"
-  packages = [
-    ".",
-    "middleware"
-  ]
+  packages = ["."]
   revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
   version = "v3.3.2"
 
@@ -59,12 +29,6 @@
   version = "v0.16.0"
 
 [[projects]]
-  name = "github.com/pkg/errors"
-  packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
-
-[[projects]]
   name = "gopkg.in/go-playground/validator.v9"
   packages = ["."]
   revision = "3620d3c0694119b61c72071ff5a05a976e97b05a"
@@ -73,6 +37,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a7f2dfde3bd1b3612b4eec96078eec061472c24e7d055e6640a1fc3f8b2998a1"
+  inputs-digest = "bd9525cb530c0a661be5d25b746c1891f88c968cde859ccd1e9430f59e9466ee"
   solver-name = "gps-cdcl"
   solver-version = 1
