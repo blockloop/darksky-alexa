@@ -11,10 +11,17 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Cache is a layer which caches darksky forecast results
-type Cache interface {
+// Forecast is a layer which caches darksky forecast results
+type Forecast interface {
 	GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error)
 	PutForecast(ctx context.Context, lat, lon string, f *darksky.Forecast) error
+}
+
+// Device is a device cache which caches deviceIDs to zipcodes to prevent the
+// constant lookup of zipcode for deviceID
+type Device interface {
+	DeviceZip(ctx context.Context, deviceID string) (string, error)
+	PutDeviceZip(ctx context.Context, deviceID, zip string) error
 }
 
 // NewRedis creates a new redis cache store with the default TTL of 15m
@@ -35,6 +42,31 @@ type Redis struct {
 // SetTTL sets the TTL used for every cache record in Redis
 func (c *Redis) SetTTL(dur time.Duration) {
 	c.ttl = int64(dur.Seconds())
+}
+
+// DeviceZip retrieves a zipcode for a deviceID
+func (c *Redis) DeviceZip(ctx context.Context, deviceID string) (string, error) {
+	con := c.pool.Get()
+	defer con.Close()
+
+	zip, err := redis.String(con.Do("HGET", "devices", deviceID))
+	if err != nil {
+		if err == redis.ErrNil {
+			return "", nil
+		}
+		return "", errors.Wrap(err, "failed to get device")
+	}
+
+	return zip, nil
+}
+
+// PutDeviceZip stores a zipcode for a deviceID
+func (c *Redis) PutDeviceZip(ctx context.Context, deviceID, zip string) error {
+	con := c.pool.Get()
+	defer con.Close()
+
+	_, err := con.Do("HSETNX", "devices", deviceID, zip)
+	return errors.Wrap(err, "failed to set cache")
 }
 
 // GetForecast retrieves a cache forecast from the redis store. If

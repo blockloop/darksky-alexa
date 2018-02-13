@@ -40,14 +40,13 @@ var (
 )
 
 func init() {
+	// not using config to avoid logging until log has been setup
+	initLogging(os.Getenv("PAPERTRAIL_DEST"))
 }
 
 func main() {
-	// not using config to avoid logging until log has been setup
-	initLogging(os.Getenv("PAPERTRAIL_DEST"))
-
 	if err := env.Parse(&config); err != nil {
-		log.WithError(err).Fatal("configuration failure")
+		log.WithError(err).Fatal("config failure")
 	}
 	if config.RedisURL == "" {
 		server, err := miniredis.Run()
@@ -68,8 +67,8 @@ func main() {
 	geodb := geo.New(redisPool)
 	dsapi := darksky.New(config.DarkskyToken)
 	redisCache := cache.NewRedis(redisPool)
-	cachedDarksky := cache.NewWriteThrough(redisCache, dsapi)
-	alexaAPI := initAlexaAPI(config.MockZipcode)
+	cachedDarksky := cache.NewWriteThroughForecast(redisCache, dsapi)
+	alexaAPI := initAlexaAPI(redisCache, config.MockZipcode)
 
 	mux := chi.NewMux()
 	mux.Use(
@@ -94,9 +93,9 @@ func main() {
 	log.Info("shutting down")
 }
 
-func initAlexaAPI(mockZip string) alexa.API {
+func initAlexaAPI(redisCache *cache.Redis, mockZip string) alexa.API {
 	if mockZip == "" {
-		return alexa.NewAPI()
+		return cache.NewWriteThroughDevice(redisCache, alexa.NewAPI())
 	}
 	return NewStubZipcodeLoader(mockZip)
 }

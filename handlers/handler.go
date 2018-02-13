@@ -29,14 +29,14 @@ type darkskyAPI interface {
 }
 
 // Alexa handles requests made from the Amazon Echo
-func Alexa(alexaAPI alexa.API, geoDB *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
+func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
 		var req alexa.Request
 		if err := tea.Body(r, &req); err != nil {
 			return tea.Error(400, errors.Wrap(err, "invalid request").Error())
 		}
 
-		lat, lon := getLocation(r.Context(), &req, alexaAPI, geoDB)
+		lat, lon := getLocation(r.Context(), &req, alexaAPI, db)
 
 		return getWeather(r.Context(), lat, lon, dsapi)
 	}
@@ -68,7 +68,7 @@ func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo
 
 	var zip string
 	if deviceID == "" || accessToken == "" {
-		ll.Error("no device info was found in request")
+		ll.Info("no device info was found in request")
 		return defaultLat, defaultLon
 	}
 	var err error
@@ -80,6 +80,6 @@ func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo
 	if lat, lon, ok := db.Lookup(zip); ok {
 		return lat, lon
 	}
-	ll.Error("failed to retrieve zipcode from geoDB. Using default location")
+	ll.WithField("zip", zip).Error("failed to retrieve zipcode from geoDB. Using default location")
 	return defaultLat, defaultLon
 }

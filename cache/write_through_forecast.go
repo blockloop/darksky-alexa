@@ -8,15 +8,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// WriteThrough is a cache layer that has a fallback layer
-type WriteThrough struct {
-	cache Cache
+// WriteThroughForecast is a cache layer that has a fallback layer
+type WriteThroughForecast struct {
+	cache Forecast
 	api   *darksky.API
 }
 
-// NewWriteThrough creates a new WriteThrough cache
-func NewWriteThrough(cache Cache, api *darksky.API) *WriteThrough {
-	return &WriteThrough{
+// NewWriteThroughForecast creates a new WriteThrough cache
+func NewWriteThroughForecast(cache Forecast, api *darksky.API) *WriteThroughForecast {
+	return &WriteThroughForecast{
 		cache: cache,
 		api:   api,
 	}
@@ -25,7 +25,7 @@ func NewWriteThrough(cache Cache, api *darksky.API) *WriteThrough {
 // GetForecast first tries to retrieve a cached result and falls back to
 // directly fetching to the API. If the API is used then results are
 // stored in the cache store
-func (w *WriteThrough) GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error) {
+func (w *WriteThroughForecast) GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error) {
 	ll := log.WithFields(log.Fields{
 		"latitude":  lat,
 		"longitude": lon,
