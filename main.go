@@ -81,8 +81,9 @@ func main() {
 
 	mux.Get("/ping", handlers.Ping)
 
-	rl := ratelimiter.New(redisPool, config.RequestsPerDay, config.IPRequestsPerDay)
-	mux.With(rl).Post("/darksky", handlers.Alexa(alexaAPI, geodb, cachedDarksky))
+	mux.With(
+		ratelimiter.New(redisPool, config.RequestsPerDay, config.IPRequestsPerDay),
+	).Post("/darksky", handlers.Alexa(alexaAPI, geodb, cachedDarksky))
 
 	addr := ":3000"
 	log.WithField("addr", addr).Info("server started")
@@ -114,21 +115,25 @@ func initLogging(papertrailAddr string) {
 	if papertrailAddr == "" {
 		return
 	}
+
+	ll := log.WithFields(log.Fields{
+		"addr":      papertrailAddr,
+		"component": "papertrail",
+	})
+
 	host, portstr, err := net.SplitHostPort(papertrailAddr)
 	if err != nil || !strings.Contains(host, ".papertrailapp.com") {
-		log.WithError(err).WithField("addr", papertrailAddr).
-			Fatal("invalid papertrail address should be like logs2.papertrailapp.com:33078")
+		ll.WithError(err).Fatal("invalid papertrail address should be like logs2.papertrailapp.com:33078")
 	}
 	port, err := strconv.Atoi(portstr)
 	if err != nil {
-		log.WithError(err).WithField("addr", papertrailAddr).
-			Fatal("invalid papertrail address: no port was found")
+		ll.WithError(err).Fatal("invalid papertrail address: no port was found")
 	}
 
 	cname := strings.Split(host, ".")[0]
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.WithError(err).Info("failed to detect hostname")
+		ll.WithError(err).Info("failed to detect hostname")
 	}
 
 	conf := &papertrail.Config{
@@ -138,5 +143,6 @@ func initLogging(papertrailAddr string) {
 		Tag:      "darksky-alexa",
 	}
 
+	ll.Info("enabling papertrail handler")
 	log.SetHandler(papertrail.New(conf))
 }
