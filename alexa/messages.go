@@ -1,27 +1,83 @@
-package main
+package alexa
 
 import (
 	"fmt"
 	"time"
 
 	"github.com/apex/log"
-	"github.com/go-chi/render"
 )
 
-func ResponseText(msg string) render.M {
-	return render.M{
-		"response": render.M{
-			"outputSpeech": render.M{
+// JSON is json
+type JSON map[string]interface{}
+
+// ResponseText creates a response message to send to an alexa request
+func ResponseText(msg string) interface{} {
+	return JSON{
+		"response": JSON{
+			"outputSpeech": JSON{
 				"type": "PlainText",
 				"text": msg,
 			},
 			"shouldEndSession": true,
 		},
-		"sessionAttributes": render.M{},
+		"sessionAttributes": JSON{},
 	}
 }
 
+// Request is found here
+// https://developer.amazon.com/docs/custom-skills/request-and-response-json-reference.html
 type Request struct {
+	Version string `json:"version"`
+	Session struct {
+		New         bool   `json:"new"`
+		SessionID   string `json:"sessionId"`
+		Application struct {
+			ApplicationID string `json:"applicationId"`
+		} `json:"application"`
+		Attributes struct {
+			Key string `json:"key"`
+		} `json:"attributes"`
+		User struct {
+			UserID      string `json:"userId"`
+			AccessToken string `json:"accessToken"`
+			Permissions struct {
+				ConsentToken string `json:"consentToken"`
+			} `json:"permissions"`
+		} `json:"user"`
+	} `json:"session"`
+	Context struct {
+		System struct {
+			Device struct {
+				DeviceID            string `json:"deviceId"`
+				SupportedInterfaces struct {
+					AudioPlayer struct {
+					} `json:"AudioPlayer"`
+				} `json:"supportedInterfaces"`
+			} `json:"device"`
+			Application struct {
+				ApplicationID string `json:"applicationId"`
+			} `json:"application"`
+			User struct {
+				UserID      string `json:"userId"`
+				AccessToken string `json:"accessToken"`
+				Permissions struct {
+					ConsentToken string `json:"consentToken"`
+				} `json:"permissions"`
+			} `json:"user"`
+			APIEndpoint    string `json:"apiEndpoint"`
+			APIAccessToken string `json:"apiAccessToken"`
+		} `json:"System"`
+		AudioPlayer struct {
+			PlayerActivity       string `json:"playerActivity"`
+			Token                string `json:"token"`
+			OffsetInMilliseconds int    `json:"offsetInMilliseconds"`
+		} `json:"AudioPlayer"`
+	} `json:"context"`
+	Request RequestBody `json:"request"`
+}
+
+// RequestBody is the body of the specific request
+type RequestBody struct {
 	Type      string `json:"type"`
 	RequestID string `json:"requestId"`
 	Intent    struct {
@@ -49,16 +105,18 @@ type Request struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-type RequestValues struct {
+// WeatherRequest is a formatted RequestBody
+type WeatherRequest struct {
 	Condition string
 	City      string
 	Time      time.Time
 	Duration  time.Duration
 }
 
-func (r Request) Values() RequestValues {
+// WeatherRequest parses the RequestBody as a WeatherRequest
+func (r RequestBody) WeatherRequest() WeatherRequest {
 	slots := r.Intent.Slots
-	res := RequestValues{
+	res := &WeatherRequest{
 		Condition: slots.Condition.Value,
 		City:      slots.City.Value,
 	}
@@ -80,7 +138,7 @@ func (r Request) Values() RequestValues {
 		}).Error("failed to parse timestamp")
 		res.Time = time.Now()
 	}
-	return res
+	return *res
 }
 
 func parseTime(s string) string {

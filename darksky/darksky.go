@@ -34,8 +34,9 @@ type API struct {
 	client *http.Client
 }
 
-func (api *API) GetForecast(ctx context.Context) (*Forecast, error) {
-	url := fmt.Sprintf("https://api.darksky.net/forecast/%s/32.9312340,-96.4597090", api.token)
+// GetForecast retrieves the forecast for the given latitude and longitude
+func (api *API) GetForecast(ctx context.Context, lat, lon string) (*Forecast, error) {
+	url := fmt.Sprintf("https://api.darksky.net/forecast/%s/%s,%s", api.token, lat, lon)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to generate new http request")
@@ -52,7 +53,5 @@ func (api *API) GetForecast(ctx context.Context) (*Forecast, error) {
 
 	var forecast Forecast
 	err = json.NewDecoder(resp.Body).Decode(&forecast)
-	// body, err := ioutil.ReadAll(resp.Body)
-	// log.WithField("body", string(body)).Info("got body")
 	return &forecast, errors.Wrap(err, "failed to parse response from darksky")
 }
