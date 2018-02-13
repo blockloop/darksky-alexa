@@ -8,15 +8,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alicebob/miniredis"
-	"github.com/apex/log"
-	"github.com/apex/log/handlers/papertrail"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/cache"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/geo"
 	"github.com/blockloop/darksky-alexa/handlers"
 	"github.com/blockloop/darksky-alexa/ratelimiter"
+
+	"github.com/alicebob/miniredis"
+	"github.com/apex/log"
+	"github.com/apex/log/handlers/papertrail"
 	"github.com/blockloop/tea"
 	"github.com/caarlos0/env"
 	"github.com/garyburd/redigo/redis"
@@ -35,7 +36,6 @@ var (
 		RequestsPerDay   int64  `env:"REQUESTS_PER_DAY" envDefault:"1000"`
 		IPRequestsPerDay int64  `env:"IP_REQUESTS_PER_DAY" envDefault:"50"`
 		MockZipcode      string `env:"MOCK_ZIP_CODE"`
-		Env              string `env:"ENV" envDefault:"development"`
 	}{}
 )
 
