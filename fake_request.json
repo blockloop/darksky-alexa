@@ -1,0 +1,38 @@
+{
+  "session": {
+    "new": false,
+    "sessionId": "fake",
+    "application": {
+      "applicationId": "fake"
+    },
+    "attributes": {},
+    "user": {
+      "userId": "fake"
+    }
+  },
+  "request": {
+    "type": "IntentRequest",
+    "requestId": "fake",
+    "intent": {
+      "name": "darksky",
+      "slots": {
+        "condition": {
+          "name": "condition",
+          "value": "forecast"
+        },
+        "time": {
+          "name": "time",
+          "value": "MO"
+        },
+        "day": {
+          "name": "day",
+          "value": "2018-02-14"
+        }
+      }
+    },
+    "locale": "en-US",
+    "timestamp": "2018-02-13T14:39:37Z"
+  },
+  "context": {},
+  "version": "1.0"
+}

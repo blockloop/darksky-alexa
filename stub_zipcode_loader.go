@@ -14,6 +14,6 @@ type StubZipcodeLoader struct {
 	zipcode string
 }
 
-func (s *StubZipcodeLoader) DeviceZip(ctx context.Context, deviceID, apiHost, apiAccessToken string) (string, error) {
+func (s *StubZipcodeLoader) DeviceZip(ctx context.Context, deviceID, apiAccessToken string) (string, error) {
 	return s.zipcode, nil
 }
