@@ -60,9 +60,11 @@ func getWeather(ctx context.Context, lat, lon string, api darkskyAPI) (int, inte
 }
 
 func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo.DB) (lat, long string) {
-	deviceID, accessToken := req.Context.System.Device.DeviceID, req.Context.System.APIAccessToken
+	deviceID, apiHost, accessToken :=
+		req.Context.System.Device.DeviceID, req.Context.System.APIEndpoint, req.Context.System.APIAccessToken
 	ll := log.WithFields(log.Fields{
 		"device.id":      deviceID,
+		"api.endpoint":   apiHost,
 		"hasAccessToken": accessToken != "",
 	})
 
@@ -72,7 +74,7 @@ func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo
 		return defaultLat, defaultLon
 	}
 	var err error
-	zip, err = api.DeviceZip(ctx, deviceID, accessToken)
+	zip, err = api.DeviceZip(ctx, deviceID, apiHost, accessToken)
 	if err != nil {
 		ll.WithError(err).Error("failed to retrieve zipcode for device, using default")
 	}

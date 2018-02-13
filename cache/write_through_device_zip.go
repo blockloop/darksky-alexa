@@ -25,7 +25,7 @@ func NewWriteThroughDevice(cache Device, api alexa.API) *WriteThroughDevice {
 // DeviceZip first tries to retrieve a cached result and falls back to
 // directly fetching to the API. If the API is used then results are
 // stored in the cache store
-func (w *WriteThroughDevice) DeviceZip(ctx context.Context, accessToken, deviceID string) (string, error) {
+func (w *WriteThroughDevice) DeviceZip(ctx context.Context, apiHost, accessToken, deviceID string) (string, error) {
 	ll := log.WithFields(log.Fields{
 		"component": "zipcache",
 		"device.id": deviceID,
@@ -41,7 +41,7 @@ func (w *WriteThroughDevice) DeviceZip(ctx context.Context, accessToken, deviceI
 	}
 	ll.Info("cache miss")
 
-	result, err := w.api.DeviceZip(ctx, deviceID, accessToken)
+	result, err := w.api.DeviceZip(ctx, deviceID, apiHost, accessToken)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to fetch zipcode from API")
 	}

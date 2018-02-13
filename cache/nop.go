@@ -10,10 +10,18 @@ import (
 type Nop struct {
 }
 
-func (c *Nop) GetForecast(ctx context.Context, lon, lat string) (*darksky.Forecast, error) {
+func (n *Nop) GetForecast(ctx context.Context, lat string, lon string) (*darksky.Forecast, error) {
 	return nil, nil
 }
 
-func (c *Nop) PutForecast(ctx context.Context, lon, lat string, f *darksky.Forecast) error {
+func (n *Nop) PutForecast(ctx context.Context, lat string, lon string, f *darksky.Forecast) error {
+	return nil
+}
+
+func (n *Nop) DeviceZip(ctx context.Context, deviceID string) (string, error) {
+	return "", nil
+}
+
+func (n *Nop) PutDeviceZip(ctx context.Context, deviceID string, zip string) error {
 	return nil
 }
