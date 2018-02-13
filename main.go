@@ -1,11 +1,16 @@
 package main
 
 import (
+	"net"
 	"net/http"
+	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/alicebob/miniredis"
 	"github.com/apex/log"
+	"github.com/apex/log/handlers/papertrail"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/cache"
 	"github.com/blockloop/darksky-alexa/darksky"
@@ -30,6 +35,8 @@ var (
 		RequestsPerDay   int64  `env:"REQUESTS_PER_DAY" envDefault:"1000"`
 		IPRequestsPerDay int64  `env:"IP_REQUESTS_PER_DAY" envDefault:"50"`
 		MockZipcode      string `env:"MOCK_ZIP_CODE"`
+		Env              string `env:"ENV" envDefault:"development"`
+		PapertrailAddr   string `env:"PAPERTRAIL_DEST"`
 	}{}
 )
 
@@ -37,6 +44,7 @@ func init() {
 }
 
 func main() {
+	initLogging(config.PapertrailAddr)
 	if err := env.Parse(&config); err != nil {
 		log.WithError(err).Fatal("configuration failure")
 	}
@@ -100,4 +108,35 @@ func initRedis(url string, maxIdle int) *redis.Pool {
 		log.WithError(err).Fatal("failed to dial redis")
 	}
 	return redis.NewPool(dialRedis, maxIdle)
+}
+
+func initLogging(papertrailAddr string) {
+	if papertrailAddr == "" {
+		return
+	}
+	host, portstr, err := net.SplitHostPort(papertrailAddr)
+	if err != nil || !strings.Contains(host, ".papertrailapp.com") {
+		log.WithError(err).WithField("addr", papertrailAddr).
+			Fatal("invalid papertrail address should be like logs2.papertrailapp.com:33078")
+	}
+	port, err := strconv.Atoi(portstr)
+	if err != nil {
+		log.WithError(err).WithField("addr", papertrailAddr).
+			Fatal("invalid papertrail address: no port was found")
+	}
+
+	cname := strings.Split(host, ".")[0]
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.WithError(err).Info("failed to detect hostname")
+	}
+
+	conf := &papertrail.Config{
+		Host:     cname,
+		Port:     port,
+		Hostname: hostname,
+		Tag:      "darksky-alexa",
+	}
+
+	log.SetHandler(papertrail.New(conf))
 }
