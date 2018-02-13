@@ -27,32 +27,33 @@ func NewWriteThroughForecast(cache Forecast, api *darksky.API) *WriteThroughFore
 // stored in the cache store
 func (w *WriteThroughForecast) GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error) {
 	ll := log.WithFields(log.Fields{
+		"component": "forecastcache",
 		"latitude":  lat,
 		"longitude": lon,
 	})
 
-	cached, err := w.cache.GetForecast(ctx, lat, lon)
+	forecast, err := w.cache.GetForecast(ctx, lat, lon)
 	if err != nil {
 		ll.WithError(err).Error("failed to get cached forecast")
 	}
-	if cached != nil {
+	if forecast != nil {
 		ll.Info("cache hit")
-		return cached, nil
+		return forecast, nil
 	}
 	ll.Info("cache miss")
 
-	result, err := w.api.GetForecast(ctx, lat, lon)
+	forecast, err = w.api.GetForecast(ctx, lat, lon)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to fetch forecast from API")
 	}
-	if result != nil {
+	if forecast != nil {
 		go func(ll log.Interface) {
-			err := w.cache.PutForecast(context.Background(), lat, lon, result)
+			err := w.cache.PutForecast(context.Background(), lat, lon, forecast)
 			if err != nil {
 				ll.WithError(err).Error("failed to put cache")
 			}
 		}(ll)
 	}
 
-	return result, nil
+	return forecast, nil
 }
