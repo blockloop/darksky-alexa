@@ -36,7 +36,6 @@ var (
 		IPRequestsPerDay int64  `env:"IP_REQUESTS_PER_DAY" envDefault:"50"`
 		MockZipcode      string `env:"MOCK_ZIP_CODE"`
 		Env              string `env:"ENV" envDefault:"development"`
-		PapertrailAddr   string `env:"PAPERTRAIL_DEST"`
 	}{}
 )
 
@@ -44,7 +43,9 @@ func init() {
 }
 
 func main() {
-	initLogging(config.PapertrailAddr)
+	// not using config to avoid logging until log has been setup
+	initLogging(os.Getenv("PAPERTRAIL_DEST"))
+
 	if err := env.Parse(&config); err != nil {
 		log.WithError(err).Fatal("configuration failure")
 	}
@@ -112,14 +113,15 @@ func initRedis(url string, maxIdle int) *redis.Pool {
 }
 
 func initLogging(papertrailAddr string) {
-	if papertrailAddr == "" {
-		return
-	}
-
 	ll := log.WithFields(log.Fields{
 		"addr":      papertrailAddr,
 		"component": "papertrail",
 	})
+
+	if papertrailAddr == "" {
+		ll.Info("disable")
+		return
+	}
 
 	host, portstr, err := net.SplitHostPort(papertrailAddr)
 	if err != nil || !strings.Contains(host, ".papertrailapp.com") {
