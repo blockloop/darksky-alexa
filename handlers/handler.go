@@ -36,16 +36,7 @@ func Alexa(alexaAPI alexa.API, geoDB *geo.DB, dsapi darkskyAPI) http.HandlerFunc
 			return tea.Error(400, errors.Wrap(err, "invalid request").Error())
 		}
 
-		zip, err := alexaAPI.DeviceZip(r.Context(), req.Context.System.Device.DeviceID, req.Context.System.APIAccessToken)
-		if err != nil {
-			log.WithError(err).Error("failed to retrieve zipcode for device")
-			return tea.StatusError(500)
-		}
-		lat, lon, ok := geoDB.Lookup(zip)
-		if !ok {
-			log.Error("failed to retrieve zipcode from geoDB. Using default location")
-			lat, lon = defaultLat, defaultLon
-		}
+		lat, lon := getLocation(r.Context(), &req, alexaAPI, geoDB)
 
 		return getWeather(r.Context(), lat, lon, dsapi)
 	}
@@ -66,4 +57,29 @@ func getWeather(ctx context.Context, lat, lon string, api darkskyAPI) (int, inte
 		forecast.Daily.Data[0].TemperatureLow,
 	)
 	return 200, alexa.ResponseText(msg)
+}
+
+func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo.DB) (lat, long string) {
+	deviceID, accessToken := req.Context.System.Device.DeviceID, req.Context.System.APIAccessToken
+	ll := log.WithFields(log.Fields{
+		"device.id":      deviceID,
+		"hasAccessToken": accessToken != "",
+	})
+
+	var zip string
+	if deviceID == "" || accessToken == "" {
+		ll.Error("no device info was found in request")
+		return defaultLat, defaultLon
+	}
+	var err error
+	zip, err = api.DeviceZip(ctx, deviceID, accessToken)
+	if err != nil {
+		ll.WithError(err).Error("failed to retrieve zipcode for device, using default")
+	}
+
+	if lat, lon, ok := db.Lookup(zip); ok {
+		return lat, lon
+	}
+	ll.Error("failed to retrieve zipcode from geoDB. Using default location")
+	return defaultLat, defaultLon
 }
