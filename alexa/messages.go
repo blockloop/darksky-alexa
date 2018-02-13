@@ -121,7 +121,7 @@ func (r RequestBody) WeatherRequest() WeatherRequest {
 		City:      slots.City.Value,
 	}
 
-	timeofday := parseTime(slots.Time.Value)
+	timeofday, dur := parseTime(slots.Time.Value)
 	day, dur, err := parseDay(slots.Day.Value)
 	if err != nil {
 		log.WithError(err).Info("failed to parse day utterance")
@@ -141,12 +141,20 @@ func (r RequestBody) WeatherRequest() WeatherRequest {
 	return *res
 }
 
-func parseTime(s string) string {
+func parseTime(s string) (string, time.Duration) {
+	// TODO FIXME combine this with parseDay and do them  both together
+	// night: NI, morning: MO, afternoon: AF, evening: EV.
 	switch s {
 	case "MO":
-		return "08:00"
+		return "06:00", time.Hour * 6
+	case "AF":
+		return "12:00", time.Hour * 5
+	case "EV":
+		return "17:00", time.Hour * 4
+	case "NI":
+		return "20:00", time.Hour * 4
 	default:
-		return s
+		return s, 0
 	}
 }
 
