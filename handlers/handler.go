@@ -29,6 +29,8 @@ type darkskyAPI interface {
 }
 
 // Alexa handles requests made from the Amazon Echo
+//
+// TODO will it rain? "precipProbability": 0.73 && "precipType": "rain",
 func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
 		var req alexa.Request
@@ -60,11 +62,9 @@ func getWeather(ctx context.Context, lat, lon string, api darkskyAPI) (int, inte
 }
 
 func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo.DB) (lat, long string) {
-	deviceID, apiHost, accessToken :=
-		req.Context.System.Device.DeviceID, req.Context.System.APIEndpoint, req.Context.System.APIAccessToken
+	deviceID, accessToken := req.Context.System.Device.DeviceID, req.Context.System.APIAccessToken
 	ll := log.WithFields(log.Fields{
 		"device.id":      deviceID,
-		"api.endpoint":   apiHost,
 		"hasAccessToken": accessToken != "",
 	})
 
@@ -74,7 +74,7 @@ func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo
 		return defaultLat, defaultLon
 	}
 	var err error
-	zip, err = api.DeviceZip(ctx, deviceID, apiHost, accessToken)
+	zip, err = api.DeviceZip(ctx, deviceID, accessToken)
 	if err != nil {
 		ll.WithError(err).Error("failed to retrieve zipcode for device, using default")
 	}

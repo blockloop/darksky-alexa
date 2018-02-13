@@ -26,7 +26,7 @@ type Client struct {
 
 // API loads zipcodes for devices
 type API interface {
-	DeviceZip(ctx context.Context, deviceID, apiHost, apiAccessToken string) (string, error)
+	DeviceZip(ctx context.Context, deviceID, apiAccessToken string) (string, error)
 }
 
 // NewAPI creates a new API that connects to the Alexa API for retrieving
@@ -46,8 +46,8 @@ func NewAPI() *Client {
 // Accept: application/json
 // Authorization: Bearer {apiAccessToken}
 // GET https://api.amazonalexa.com/v1/devices/{deviceId}/settings/address/countryAndPostalCode
-func (api *Client) DeviceZip(ctx context.Context, deviceID, apiHost, apiAccessToken string) (string, error) {
-	url := fmt.Sprintf(apiHost+"/v1/devices/%s/settings/address/countryAndPostalCode", deviceID)
+func (api *Client) DeviceZip(ctx context.Context, deviceID, apiAccessToken string) (string, error) {
+	url := fmt.Sprintf("https://api.amazonalexa.com/v1/devices/%s/settings/address/countryAndPostalCode", deviceID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", errors.Wrap(err, "failed to generate HTTP request")
