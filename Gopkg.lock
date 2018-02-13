@@ -2,6 +2,21 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/alicebob/gopher-json"
+  packages = ["."]
+  revision = "5a6b3ba71ee69b77cf64febf8b5a7526ca5eaef0"
+
+[[projects]]
+  name = "github.com/alicebob/miniredis"
+  packages = [
+    ".",
+    "server"
+  ]
+  revision = "9d52b1fc8da9c42dae29127fdc6f795ddcd4810f"
+  version = "2.3.2"
+
+[[projects]]
   name = "github.com/apex/log"
   packages = ["."]
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
@@ -65,6 +80,17 @@
   version = "v0.8.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/yuin/gopher-lua"
+  packages = [
+    ".",
+    "ast",
+    "parse",
+    "pm"
+  ]
+  revision = "7d7bc8747e3f614c5c587729a341fe7d8903cdb8"
+
+[[projects]]
   name = "gopkg.in/go-playground/validator.v9"
   packages = ["."]
   revision = "3620d3c0694119b61c72071ff5a05a976e97b05a"
@@ -73,6 +99,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a7f2dfde3bd1b3612b4eec96078eec061472c24e7d055e6640a1fc3f8b2998a1"
+  inputs-digest = "88853de5f37859ee9a30e41834741033361b3879ba0c199b2097fa9bc75014a5"
   solver-name = "gps-cdcl"
   solver-version = 1
