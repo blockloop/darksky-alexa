@@ -15,18 +15,6 @@ type WeatherRequest struct {
 	TimeSpan
 }
 
-// TimeSpan is a period of time indicating a start time,
-// a Span, and a count
-type TimeSpan struct {
-	Start time.Time
-	Span  time.Duration
-}
-
-// IsZero returns true if TimeSpan is zero value
-func (ts TimeSpan) IsZero() bool {
-	return ts.Start.IsZero()
-}
-
 var (
 	weekRegex = regexp.MustCompile(`(\d{4})-W(\d{1,2})(-WE)?`)
 )
@@ -112,31 +100,35 @@ func parseTime(s string) (hour int, dur time.Duration) {
 // and a season indicator: winter: WI, spring: SP, summer: SU, fall: FA)
 //
 // https://developer.amazon.com/docs/custom-skills/slot-type-reference.html#date
-func parseDay(day string) TimeSpan {
-	ll := log.WithField("day", day)
-	ts := TimeSpan{
+func parseDay(day string) (ts TimeSpan) {
+	immediate := TimeSpan{
 		Start: time.Now().UTC(),
-		Span:  Day,
+	}
+
+	if day == "" {
+		return immediate
 	}
 
 	// try to parse simple date first
 	if simpleDay, err := time.Parse("2006-01-02", day); err == nil {
-		ts.Start = simpleDay
-		return ts
+		return TimeSpan{
+			Start: simpleDay,
+			Span:  Day,
+		}
 	}
 	if simpleMonth, err := time.Parse("2006-01", day); err == nil {
-		ts.Start = simpleMonth
-		ts.Span = Week
-		return ts
+		return TimeSpan{
+			Start: simpleMonth,
+			Span:  Week,
+		}
 	}
 
-	week := parseWeek(day)
-	if week.IsZero() {
-		ll.Info("unknown day. Using NOW")
-		return ts
+	if week := parseWeek(day); !week.IsZero() {
+		return week
 	}
 
-	return week
+	log.WithField("day", day).Info("unknown day. Using NOW")
+	return immediate
 }
 
 func parseWeek(s string) TimeSpan {

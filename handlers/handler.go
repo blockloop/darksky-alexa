@@ -7,8 +7,8 @@ import (
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
-	"github.com/blockloop/darksky-alexa/formatter"
 	"github.com/blockloop/darksky-alexa/geo"
+	"github.com/blockloop/darksky-alexa/speech"
 	"github.com/blockloop/tea"
 	"github.com/pkg/errors"
 )
@@ -41,7 +41,7 @@ func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 		}
 
 		question := alexa.ParseWeatherRequest(req.Request)
-		response := formatter.Format(*forecast, question)
+		response := speech.Speak(*forecast, question)
 
 		return 200, alexa.ResponseText(response)
 	}
