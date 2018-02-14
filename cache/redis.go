@@ -75,8 +75,8 @@ func (c *Redis) GetForecast(ctx context.Context, lat, lon string) (*darksky.Fore
 	con := c.pool.Get()
 	defer con.Close()
 
-	key := fmt.Sprintf("%s:%s", lat, lon)
-	raw, err := redis.Bytes(con.Do("HGET", "forecast", key))
+	key := fmt.Sprintf("forecast:%s,%s", lat, lon)
+	raw, err := redis.Bytes(con.Do("GET", key))
 	if err != nil {
 		if err == redis.ErrNil {
 			return nil, nil
@@ -99,9 +99,9 @@ func (c *Redis) PutForecast(ctx context.Context, lat, lon string, f *darksky.For
 		return errors.Wrap(err, "failed to marshal JSON")
 	}
 
-	key := fmt.Sprintf("%s:%s", lat, lon)
+	key := fmt.Sprintf("forecast:%s,%s", lat, lon)
 	con.Send("MULTI")
-	con.Send("HSETNX", "forecast", key, encoded)
+	con.Send("SET", key, encoded)
 	con.Send("EXPIRE", key, c.ttl)
 	_, err = con.Do("EXEC")
 
