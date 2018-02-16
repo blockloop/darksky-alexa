@@ -1,49 +1,35 @@
 package speech
 
 import (
-	"fmt"
-
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/speech/speakers"
 )
 
-// Weather conditions that have been configured in the Alexa skill
-// these show up under alexa.WeatherRequest.Condition
-const (
-	Low         = "low"
-	High        = "high"
-	Snow        = "snow"
-	Rain        = "rain"
-	Humidity    = "humidity"
-	Forecast    = "forecast"
-	ExtForecast = "extended forecast"
-	Temperature = "temperature"
-)
+// Default speaks the default message
+var Default = speakers.Current{}.Speak
 
-// Speak formats weather that makes sense to the query
+// Speak formats weather that makes sense to the query. If no handler is
+// found then the Default speaker is used.
 //
 // if the question is "will it rain tomorrow?" then the response should
-// respond with yes or no and the
-func Speak(forecast darksky.Forecast, q alexa.WeatherRequest) string {
+// respond with yes or no and the time it is expected to rain
+func Speak(forecast *darksky.Forecast, q alexa.WeatherRequest) string {
 	ll := log.WithFields(log.Fields{
 		"query.condition": q.Condition,
-		"query.span":      q.Span,
+		"query.end":       q.End,
 		"query.start":     q.Start,
 	})
 
-	for _, speaker := range speakers {
-		if msg, ok := speaker(&forecast, &q); ok {
-			return msg
+	for _, speaker := range speakers.All {
+		if !speaker.CanSpeak(&q) {
+			continue
 		}
+		ll.WithField("speaker", speaker.Name()).Info("speaking")
+		return speaker.Speak(forecast, &q)
 	}
 
-	ll.Info("using simple")
-	msg := fmt.Sprintf("currently %.0f° and %s with a high of %.0f and a low of %.0f",
-		forecast.Hourly.Data[0].Temperature,
-		forecast.Currently.Summary,
-		forecast.Daily.Data[0].TemperatureHigh,
-		forecast.Daily.Data[0].TemperatureLow,
-	)
-	return msg
+	ll.Warn("No speaker was found. Falling back to default.")
+	return Default(forecast, &q)
 }

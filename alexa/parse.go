@@ -27,6 +27,9 @@ const (
 )
 
 const (
+	yyyymmdd = "2006-01-02"
+	yyyymm   = "2006-01"
+
 	morning   = "MO"
 	afternoon = "AF"
 	evening   = "EV"
@@ -47,10 +50,10 @@ func ParseWeatherRequest(r RequestBody) WeatherRequest {
 
 func parseDuration(timeofday, day string) TimeSpan {
 	ts := parseDay(day)
-	if ts.Span == Day && timeofday != "" {
-		var hour int
-		hour, ts.Span = parseTime(timeofday)
-		ts.Start = time.Date(ts.Start.Year(), ts.Start.Month(), ts.Start.Day(), hour, 0, 0, 0, time.UTC)
+	if timeofday != "" {
+		hour, span := parseTime(timeofday)
+		ts.Start = time.Date(ts.Start.Year(), ts.Start.Month(), ts.Start.Day(), hour, 0, 0, 0, time.Local)
+		ts.End = ts.Start.Add(span)
 	}
 	return ts
 }
@@ -101,8 +104,11 @@ func parseTime(s string) (hour int, dur time.Duration) {
 //
 // https://developer.amazon.com/docs/custom-skills/slot-type-reference.html#date
 func parseDay(day string) (ts TimeSpan) {
+	today := now.New(time.Now()).BeginningOfDay()
+
 	immediate := TimeSpan{
-		Start: time.Now().UTC(),
+		Start: today,
+		End:   now.New(today).EndOfDay(),
 	}
 
 	if day == "" {
@@ -110,16 +116,16 @@ func parseDay(day string) (ts TimeSpan) {
 	}
 
 	// try to parse simple date first
-	if simpleDay, err := time.Parse("2006-01-02", day); err == nil {
+	if simpleDay, err := time.Parse(yyyymmdd, day); err == nil {
 		return TimeSpan{
 			Start: simpleDay,
-			Span:  Day,
+			End:   now.New(simpleDay).EndOfDay(),
 		}
 	}
-	if simpleMonth, err := time.Parse("2006-01", day); err == nil {
+	if simpleMonth, err := time.Parse(yyyymm, day); err == nil {
 		return TimeSpan{
 			Start: simpleMonth,
-			Span:  Week,
+			End:   now.New(simpleMonth).EndOfWeek(),
 		}
 	}
 
@@ -139,25 +145,32 @@ func parseWeek(s string) TimeSpan {
 	}
 
 	year, _ := strconv.Atoi(items[1])
-	week, _ := strconv.Atoi(items[2])
+	zweek, _ := strconv.Atoi(items[2])
+	zweek = zweek - 1
 	weekend := items[3] != ""
 
-	date := now.New(time.Date(year, time.January, 1, 0, 0, 0, 0, time.UTC).
-		AddDate(0, 0, (week-1)*7))
+	week := now.New(time.Date(year, time.January, 1, 0, 0, 0, 1, time.Local))
+	if zweek > 0 {
+		week = now.New(week.AddDate(0, 0, zweek*7))
+	}
+	bow := week.BeginningOfWeek()
+	eow := week.EndOfWeek()
 
 	log.WithFields(log.Fields{
 		"orig":   s,
-		"parsed": date.String(),
+		"parsed": week.String(),
 	}).Info("parsed date")
 
 	if !weekend {
 		return TimeSpan{
-			Start: date.BeginningOfWeek().Add(time.Hour * 24),
-			Span:  Week,
+			Start: bow,
+			End:   eow,
 		}
 	}
+	// weekend means Saturday and Sunday
+	eow = eow.AddDate(0, 0, 1)
 	return TimeSpan{
-		Start: date.EndOfWeek(),
-		Span:  Day * 2,
+		Start: now.New(eow.AddDate(0, 0, -1)).BeginningOfDay(),
+		End:   eow,
 	}
 }

@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/apex/log"
+	"github.com/blockloop/darksky-alexa/cache"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
 )
 
 // New creates a new rate limiter
-func New(pool *redis.Pool, totalPerDay, ipPerDay int64) func(http.Handler) http.Handler {
+func New(pool cache.RedisPool, totalPerDay, ipPerDay int64) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			now := time.Now()

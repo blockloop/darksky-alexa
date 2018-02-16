@@ -27,6 +27,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/benbjohnson/clock"
+  packages = ["."]
+  revision = "7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19"
+
+[[projects]]
+  branch = "master"
   name = "github.com/blockloop/tea"
   packages = ["."]
   revision = "246ee39990da57bcb2773211f6d0f593d88145b6"
@@ -138,6 +144,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "69304125b30d220e60c07ececac83f9b38ad3eb6498ab05b99e75e70ec5ae256"
+  inputs-digest = "80f3a6950a7ee583f9627e7450d7a59cc10caced28a7cc1e7c5a3047b2652760"
   solver-name = "gps-cdcl"
   solver-version = 1

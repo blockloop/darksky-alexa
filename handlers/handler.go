@@ -40,8 +40,8 @@ func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 			return tea.StatusError(500)
 		}
 
-		question := alexa.ParseWeatherRequest(req.Request)
-		response := speech.Speak(*forecast, question)
+		q := alexa.ParseWeatherRequest(req.Request)
+		response := speech.Speak(forecast, q)
 
 		return 200, alexa.ResponseText(response)
 	}

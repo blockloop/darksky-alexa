@@ -1,77 +1,83 @@
 package darksky
 
-type Forecast RawForecast
+import (
+	"time"
+)
 
-type RawForecast struct {
-	Alerts    []Alert    `json:"alerts"`
-	Currently DataPoint  `json:"currently"`
-	Daily     DataPoints `json:"daily"`
-	Hourly    DataPoints `json:"hourly"`
-	Latitude  float64    `json:"latitude"`
-	Longitude float64    `json:"longitude"`
-	Minutely  DataPoints `json:"minutely"`
-	Timezone  string     `json:"timezone"`
+// UnixTime is a timestamp that unmarshals from a unix timestamp
+type UnixTime int64
+
+func (t UnixTime) Time() time.Time {
+	return time.Unix(int64(t), 0)
 }
 
-type DataPoints struct {
-	Summary string      `json:"summary"`
-	Icon    string      `json:"icon"`
-	Data    []DataPoint `json:"data"`
+type Forecast struct {
+	Alerts    []Alert   `json:"alerts,omitempty"`
+	Currently DataPoint `json:"currently,omitempty"`
+	Daily     DataBlock `json:"daily,omitempty"`
+	Hourly    DataBlock `json:"hourly,omitempty"`
+	Latitude  float64   `json:"latitude,omitempty"`
+	Longitude float64   `json:"longitude,omitempty"`
+	Minutely  DataBlock `json:"minutely,omitempty"`
+	Timezone  string    `json:"timezone,omitempty"`
 }
 
-type Currently struct {
+type DataBlock struct {
+	Summary string      `json:"summary,omitempty"`
+	Icon    string      `json:"icon,omitempty"`
+	Data    []DataPoint `json:"data,omitempty"`
 }
 
 type DataPoint struct {
-	ApparentTemperature             float64 `json:"apparentTemperature"`
-	ApparentTemperatureHigh         float64 `json:"apparentTemperatureHigh"`
-	ApparentTemperatureHighUnixTime int64   `json:"apparentTemperatureHighTime"`
-	ApparentTemperatureLow          float64 `json:"apparentTemperatureLow"`
-	ApparentTemperatureLowUnixTime  int64   `json:"apparentTemperatureLowTime"`
-	ApparentTemperatureMax          float64 `json:"apparentTemperatureMax"`
-	ApparentTemperatureMaxUnixTime  int64   `json:"apparentTemperatureMaxTime"`
-	ApparentTemperatureMin          float64 `json:"apparentTemperatureMin"`
-	ApparentTemperatureMinUnixTime  int64   `json:"apparentTemperatureMinTime"`
-	CloudCover                      float64 `json:"cloudCover"`
-	DewPoint                        float64 `json:"dewPoint"`
-	Humidity                        float64 `json:"humidity"`
-	Icon                            string  `json:"icon"`
-	MoonPhase                       float64 `json:"moonPhase"`
-	NearestStormDistance            int     `json:"nearestStormDistance"`
-	Ozone                           float64 `json:"ozone"`
-	PrecipIntensity                 float64 `json:"precipIntensity"`
-	PrecipIntensityError            float64 `json:"precipIntensityError"`
-	PrecipIntensityMax              float64 `json:"precipIntensityMax"`
-	PrecipIntensityMaxUnixTime      int64   `json:"precipIntensityMaxTime"`
-	PrecipProbability               float64 `json:"precipProbability"`
-	PrecipType                      string  `json:"precipType"`
-	Pressure                        float64 `json:"pressure"`
-	Summary                         string  `json:"summary"`
-	SunriseUnixTime                 int64   `json:"sunriseTime"`
-	SunsetUnixTime                  int64   `json:"sunsetTime"`
-	Temperature                     float64 `json:"temperature"`
-	TemperatureHigh                 float64 `json:"temperatureHigh"`
-	TemperatureHighUnixTime         int64   `json:"temperatureHighTime"`
-	TemperatureLow                  float64 `json:"temperatureLow"`
-	TemperatureLowUnixTime          int64   `json:"temperatureLowTime"`
-	TemperatureMax                  float64 `json:"temperatureMax"`
-	TemperatureMaxUnixTime          int64   `json:"temperatureMaxTime"`
-	TemperatureMin                  float64 `json:"temperatureMin"`
-	TemperatureMinUnixTime          int64   `json:"temperatureMinTime"`
-	UnixTime                        int64   `json:"time"`
-	UvIndex                         int     `json:"uvIndex"`
-	UvIndexUnixTime                 int64   `json:"uvIndexTime"`
-	Visibility                      float64 `json:"visibility"`
-	WindBearing                     int     `json:"windBearing"`
-	WindGust                        float64 `json:"windGust"`
-	WindGustUnixTime                int64   `json:"windGustTime"`
-	WindSpeed                       float64 `json:"windSpeed"`
+	ApparentTemperature         float64  `json:"apparentTemperature,omitempty"`
+	ApparentTemperatureHigh     float64  `json:"apparentTemperatureHigh,omitempty"`
+	ApparentTemperatureHighTime UnixTime `json:"apparentTemperatureHighTime,omitempty"`
+	ApparentTemperatureLow      float64  `json:"apparentTemperatureLow,omitempty"`
+	ApparentTemperatureLowTime  UnixTime `json:"apparentTemperatureLowTime,omitempty"`
+	ApparentTemperatureMax      float64  `json:"apparentTemperatureMax,omitempty"`
+	ApparentTemperatureMaxTime  UnixTime `json:"apparentTemperatureMaxTime,omitempty"`
+	ApparentTemperatureMin      float64  `json:"apparentTemperatureMin,omitempty"`
+	ApparentTemperatureMinTime  UnixTime `json:"apparentTemperatureMinTime,omitempty"`
+	CloudCover                  float64  `json:"cloudCover,omitempty"`
+	DewPoint                    float64  `json:"dewPoint,omitempty"`
+	Humidity                    float64  `json:"humidity,omitempty"`
+	Icon                        string   `json:"icon,omitempty"`
+	MoonPhase                   float64  `json:"moonPhase,omitempty"`
+	NearestStormDistance        int      `json:"nearestStormDistance,omitempty"`
+	Ozone                       float64  `json:"ozone,omitempty"`
+	PrecipIntensity             float64  `json:"precipIntensity,omitempty"`
+	PrecipIntensityError        float64  `json:"precipIntensityError,omitempty"`
+	PrecipIntensityMax          float64  `json:"precipIntensityMax,omitempty"`
+	PrecipIntensityMaxTime      UnixTime `json:"precipIntensityMaxTime,omitempty"`
+	PrecipProbability           float64  `json:"precipProbability,omitempty"`
+	PrecipType                  string   `json:"precipType,omitempty"`
+	Pressure                    float64  `json:"pressure,omitempty"`
+	Summary                     string   `json:"summary,omitempty"`
+	SunriseTime                 UnixTime `json:"sunriseTime,omitempty"`
+	SunsetTime                  UnixTime `json:"sunsetTime,omitempty"`
+	Temperature                 float64  `json:"temperature,omitempty"`
+	TemperatureHigh             float64  `json:"temperatureHigh,omitempty"`
+	TemperatureHighTime         UnixTime `json:"temperatureHighTime,omitempty"`
+	TemperatureLow              float64  `json:"temperatureLow,omitempty"`
+	TemperatureLowTime          UnixTime `json:"temperatureLowTime,omitempty"`
+	TemperatureMax              float64  `json:"temperatureMax,omitempty"`
+	TemperatureMaxTime          UnixTime `json:"temperatureMaxTime,omitempty"`
+	TemperatureMin              float64  `json:"temperatureMin,omitempty"`
+	TemperatureMinTime          UnixTime `json:"temperatureMinTime,omitempty"`
+	Time                        UnixTime `json:"time,omitempty"`
+	UvIndex                     int      `json:"uvIndex,omitempty"`
+	UvIndexTime                 UnixTime `json:"uvIndexTime,omitempty"`
+	Visibility                  float64  `json:"visibility,omitempty"`
+	WindBearing                 int      `json:"windBearing,omitempty"`
+	WindGust                    float64  `json:"windGust,omitempty"`
+	WindGustTime                UnixTime `json:"windGustTime,omitempty"`
+	WindSpeed                   float64  `json:"windSpeed,omitempty"`
 }
 
 type Alert struct {
-	Description string `json:"description"`
-	Expires     int64  `json:"expires"`
-	Title       string `json:"title"`
-	URI         string `json:"uri"`
-	UnixTime    int64  `json:"time"`
+	Description string   `json:"description,omitempty"`
+	Expires     UnixTime `json:"expires,omitempty"`
+	Title       string   `json:"title,omitempty"`
+	URI         string   `json:"uri,omitempty"`
+	Time        UnixTime `json:"time,omitempty"`
 }

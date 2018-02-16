@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"strings"
 	"sync/atomic"
+	"time"
 
 	"github.com/apex/log"
+	"github.com/blockloop/darksky-alexa/cache"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
 )
@@ -14,14 +16,14 @@ import (
 // New creates a new geo DB that uses the given redis pool and
 // triggers db.Load in a separate goroutine. Check DB.Loaded()
 // to determine when the datastore is fully loaded
-func New(pool *redis.Pool) *DB {
+func New(pool cache.RedisPool) *DB {
 	db := NewUnloaded(pool)
 	go db.load(zipcodesCSV)
 	return db
 }
 
 // NewUnloaded creates a new unloaded geo DB. You should
-func NewUnloaded(pool *redis.Pool) *DB {
+func NewUnloaded(pool cache.RedisPool) *DB {
 	return &DB{
 		pool: pool,
 		key:  "geo",
@@ -31,7 +33,7 @@ func NewUnloaded(pool *redis.Pool) *DB {
 // DB stores geo info to a redis store
 type DB struct {
 	key    string
-	pool   *redis.Pool
+	pool   cache.RedisPool
 	loaded int32
 }
 
@@ -97,6 +99,7 @@ func (db *DB) load(csv string) {
 		"component": "geo loader",
 	})
 
+	start := time.Now()
 	lineno := 0
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -131,6 +134,6 @@ func (db *DB) load(csv string) {
 		lineno++
 	}
 
-	ll.Info("datastore loaded")
+	ll.WithField("duration", time.Since(start)).Info("datastore loaded")
 	atomic.StoreInt32(&db.loaded, 1)
 }

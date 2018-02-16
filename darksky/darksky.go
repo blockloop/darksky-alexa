@@ -1,3 +1,5 @@
+// Package darksky provides functionality for interacting with the darksky
+// API. For more information see https://darksky.net/dev/docs
 package darksky
 
 import (

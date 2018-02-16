@@ -11,6 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
+// RedisPool is a pool of redis connections
+type RedisPool interface {
+	Get() redis.Conn
+}
+
 // Forecast is a layer which caches darksky forecast results
 type Forecast interface {
 	GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error)
@@ -25,7 +30,7 @@ type Device interface {
 }
 
 // NewRedis creates a new redis cache store with the default TTL of 15m
-func NewRedis(pool *redis.Pool) *Redis {
+func NewRedis(pool RedisPool) *Redis {
 	r := &Redis{
 		pool: pool,
 	}
@@ -35,7 +40,7 @@ func NewRedis(pool *redis.Pool) *Redis {
 
 // Redis is a cache that uses redis
 type Redis struct {
-	pool *redis.Pool
+	pool RedisPool
 	ttl  int64
 }
 
