@@ -2,7 +2,7 @@ package speakers
 
 import (
 	"fmt"
-	"time"
+	"sort"
 
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
@@ -38,45 +38,29 @@ func (lh LowHigh) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string {
 		return NoData
 	}
 
-	var temp float64
-	var when time.Time
 	switch q.Condition {
 	case low:
-		temp, when = findLow(dps)
-		break
+		dp := findLow(dps)
+		return fmt.Sprintf("%.0f is the %s %s", dp.TemperatureLow, q.Condition, humanDay(dp.Time.Time()))
 	case high:
-		temp, when = findHigh(dps)
-		break
+		dp := findHigh(dps)
+		return fmt.Sprintf("%.0f is the %s %s", dp.TemperatureHigh, q.Condition, humanDay(dp.Time.Time()))
 	default:
 		log.Error("tried to speak low/high without asking for low/high")
 		return "a problem occurred"
 	}
-
-	return fmt.Sprintf("%.0f is the %s for %s", temp, q.Condition, humanDay(when))
 }
 
-func findLow(dps []darksky.DataPoint) (lowest float64, when time.Time) {
-	lowest = dps[0].TemperatureLow
-	when = dps[0].Time.Time()
-
-	for _, dp := range dps {
-		if dp.TemperatureLow < lowest {
-			lowest = dp.TemperatureLow
-			when = dp.Time.Time()
-		}
-	}
-	return lowest, when
+func findLow(dps []darksky.DataPoint) *darksky.DataPoint {
+	sort.SliceStable(dps, func(i, j int) bool {
+		return dps[i].TemperatureLow < dps[j].TemperatureLow
+	})
+	return &dps[0]
 }
 
-func findHigh(dps []darksky.DataPoint) (high float64, when time.Time) {
-	high = dps[0].TemperatureHigh
-	when = dps[0].Time.Time()
-
-	for _, dp := range dps {
-		if dp.TemperatureHigh > high {
-			high = dp.TemperatureHigh
-			when = dp.Time.Time()
-		}
-	}
-	return high, when
+func findHigh(dps []darksky.DataPoint) *darksky.DataPoint {
+	sort.SliceStable(dps, func(i, j int) bool {
+		return dps[i].TemperatureHigh > dps[j].TemperatureHigh
+	})
+	return &dps[0]
 }

@@ -23,7 +23,7 @@ func (Forecast) CanSpeak(*alexa.WeatherRequest) bool {
 	return true
 }
 
-// the weather|forecast [day] [time]
+// Speak speaks "the weather|forecast [day] [time]"
 func (f Forecast) Speak(forecast *darksky.Forecast, q *alexa.WeatherRequest) string {
 	now := time.Now()
 	dur := q.End.Sub(q.Start)
