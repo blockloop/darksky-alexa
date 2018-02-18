@@ -18,15 +18,15 @@
       "slots": {
         "condition": {
           "name": "condition",
-          "value": "rain"
+          "value": "weather"
         },
         "time": {
           "name": "time",
-          "value": ""
+          "value": "MO"
         },
         "day": {
           "name": "day",
-          "value": "2018-W7-WE"
+          "value": "2018-02-19"
         }
       }
     },

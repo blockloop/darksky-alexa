@@ -2,6 +2,7 @@ package speakers
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
@@ -19,8 +20,8 @@ func (Precipitation) CanSpeak(q *alexa.WeatherRequest) bool {
 	return q.Condition == rain || q.Condition == snow
 }
 
-func (Precipitation) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string {
-	dps := dataPoints(&q.TimeSpan, f)
+func (p Precipitation) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string {
+	dps := p.dataPoints(&q.TimeSpan, f)
 	if len(dps) == 0 {
 		return NoData
 	}
@@ -42,4 +43,22 @@ func (Precipitation) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string 
 	return fmt.Sprintf("There is %s of %s",
 		humanProbability(found.PrecipProbability),
 		q.Condition)
+}
+
+func (Precipitation) dataPoints(ts *alexa.TimeSpan, f *darksky.Forecast) []darksky.DataPoint {
+	var prospects *darksky.DataBlock
+
+	start := ts.Start.Add(-time.Nanosecond)
+	end := ts.End.Add(time.Nanosecond)
+	if today(ts.Start) && today(ts.End) {
+		prospects = &f.Hourly
+	} else {
+		prospects = &f.Daily
+	}
+
+	items := darksky.Where(prospects.Data, func(dp darksky.DataPoint) bool {
+		itemTime := dp.Time.Time()
+		return itemTime.After(start) && itemTime.Before(end)
+	})
+	return items
 }

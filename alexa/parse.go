@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/apex/log"
-	"github.com/jinzhu/now"
+	nowutil "github.com/jinzhu/now"
 )
 
 // WeatherRequest is a formatted RequestBody
@@ -104,28 +104,27 @@ func parseTime(s string) (hour int, dur time.Duration) {
 //
 // https://developer.amazon.com/docs/custom-skills/slot-type-reference.html#date
 func parseDay(day string) (ts TimeSpan) {
-	today := now.New(time.Now()).BeginningOfDay()
-
-	immediate := TimeSpan{
-		Start: today,
-		End:   now.New(today).EndOfDay(),
+	tnow := time.Now()
+	now := TimeSpan{
+		Start: tnow,
+		End:   tnow,
 	}
 
 	if day == "" {
-		return immediate
+		return now
 	}
 
 	// try to parse simple date first
 	if simpleDay, err := time.Parse(yyyymmdd, day); err == nil {
 		return TimeSpan{
 			Start: simpleDay,
-			End:   now.New(simpleDay).EndOfDay(),
+			End:   nowutil.New(simpleDay).EndOfDay(),
 		}
 	}
 	if simpleMonth, err := time.Parse(yyyymm, day); err == nil {
 		return TimeSpan{
 			Start: simpleMonth,
-			End:   now.New(simpleMonth).EndOfWeek(),
+			End:   nowutil.New(simpleMonth).EndOfWeek(),
 		}
 	}
 
@@ -134,7 +133,7 @@ func parseDay(day string) (ts TimeSpan) {
 	}
 
 	log.WithField("day", day).Info("unknown day. Using NOW")
-	return immediate
+	return now
 }
 
 func parseWeek(s string) TimeSpan {
@@ -149,9 +148,9 @@ func parseWeek(s string) TimeSpan {
 	zweek = zweek - 1
 	weekend := items[3] != ""
 
-	week := now.New(time.Date(year, time.January, 1, 0, 0, 0, 1, time.Local))
+	week := nowutil.New(time.Date(year, time.January, 1, 0, 0, 0, 1, time.Local))
 	if zweek > 0 {
-		week = now.New(week.AddDate(0, 0, zweek*7))
+		week = nowutil.New(week.AddDate(0, 0, zweek*7))
 	}
 	bow := week.BeginningOfWeek()
 	eow := week.EndOfWeek()
@@ -170,7 +169,7 @@ func parseWeek(s string) TimeSpan {
 	// weekend means Saturday and Sunday
 	eow = eow.AddDate(0, 0, 1)
 	return TimeSpan{
-		Start: now.New(eow.AddDate(0, 0, -1)).BeginningOfDay(),
+		Start: nowutil.New(eow.AddDate(0, 0, -1)).BeginningOfDay(),
 		End:   eow,
 	}
 }

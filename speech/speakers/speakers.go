@@ -26,6 +26,8 @@ var All = []Speaker{Precipitation{}, LowHigh{}, Forecast{}, Current{}}
 // Weather conditions that have been configured in the Alexa skill
 // these show up under alexa.WeatherRequest.Condition
 const (
+	dayFormat = "2006-01-02"
+
 	low         = "low"
 	high        = "high"
 	snow        = "snow"
@@ -36,42 +38,29 @@ const (
 	temperature = "temperature"
 )
 
-// dataPoints returns the data points that pertain to the requested time
-func dataPoints(ts *alexa.TimeSpan, f *darksky.Forecast) []darksky.DataPoint {
-	var prospects *darksky.DataBlock
-
-	start := ts.Start.Add(-time.Nanosecond)
-	end := ts.End.Add(time.Nanosecond)
-	if today(ts.Start) && today(ts.End) {
-		prospects = &f.Hourly
-	} else {
-		prospects = &f.Daily
-	}
-
-	items := darksky.Where(prospects.Data, func(dp darksky.DataPoint) bool {
-		itemTime := dp.Time.Time()
-		return itemTime.After(start) && itemTime.Before(end)
-	})
-	return items
-}
-
 func sameWeek(a, b time.Time) bool {
 	ayear, aweek := a.ISOWeek()
 	byear, bweek := b.ISOWeek()
 	return ayear == byear && aweek == bweek
 }
 
-func sameDay(a, b time.Time) bool {
-	return a.Format("2006-01-02") == b.Format("2006-01-02")
+func sameDay(a, b time.Time, times ...time.Time) bool {
+	afmt, bfmt := a.Format(dayFormat), b.Format(dayFormat)
+
+	if afmt != bfmt {
+		return false
+	}
+
+	for _, t := range times {
+		if t.Format(dayFormat) != afmt {
+			return false
+		}
+	}
+	return true
 }
 
 func today(b time.Time) bool {
 	return sameDay(clock.Now(), b)
-}
-
-func tomorrow(b time.Time) bool {
-	tomorrow := clock.Now().Add(time.Hour * 24)
-	return sameDay(tomorrow, b)
 }
 
 func sameHour(a, b time.Time) bool {
@@ -84,7 +73,7 @@ func humanDay(day time.Time) string {
 	if sameDay(today, day) {
 		return "today"
 	}
-	if tomorrow(day) {
+	if sameDay(today.AddDate(0, 0, 1), day) {
 		return fmt.Sprintf("tomorrow")
 	}
 	if sameWeek(today, day) {
