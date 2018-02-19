@@ -118,7 +118,7 @@ func initLogging(papertrailAddr string) {
 	})
 
 	if papertrailAddr == "" {
-		ll.Info("disable")
+		ll.Info("disabled")
 		return
 	}
 

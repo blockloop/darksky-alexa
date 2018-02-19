@@ -3,10 +3,12 @@ package speakers
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	nowutil "github.com/jinzhu/now"
 )
 
 // LowHigh responds to the following queries
@@ -14,6 +16,8 @@ import (
 // the low|high [day] [time]
 // the low|high
 type LowHigh struct{}
+
+var _ Speaker = LowHigh{}
 
 func (LowHigh) Name() string {
 	return "LowHigh"
@@ -29,10 +33,11 @@ func (lh LowHigh) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string {
 		return "a problem occurred"
 	}
 
-	ts := &q.TimeSpan
+	start := nowutil.New(q.Start).BeginningOfDay().Add(-time.Nanosecond)
+	end := nowutil.New(q.End).EndOfDay()
 	dps := darksky.Where(f.Daily.Data, func(dp darksky.DataPoint) bool {
-		itemTime := dp.Time.Time()
-		return itemTime.Before(ts.End) && (itemTime.After(ts.Start) || sameDay(itemTime, ts.Start))
+		t := dp.Time.Time()
+		return t.Before(end) && t.After(start)
 	})
 	if len(dps) == 0 {
 		return NoData
