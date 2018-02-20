@@ -55,7 +55,7 @@ func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo.DB) location {
 	deviceID, accessToken := req.Context.System.Device.DeviceID, req.Context.System.APIAccessToken
 	ll := log.WithFields(log.Fields{
-		"device.id":   deviceID,
+		"device.id":   clip(deviceID, 25),
 		"accessToken": clip(accessToken, 25),
 	})
 

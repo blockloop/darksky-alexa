@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
@@ -28,7 +29,7 @@ func NewWriteThroughDevice(cache Device, api alexa.API) *WriteThroughDevice {
 func (w *WriteThroughDevice) DeviceZip(ctx context.Context, accessToken, deviceID string) (string, error) {
 	ll := log.WithFields(log.Fields{
 		"component": "zipcache",
-		"device.id": deviceID,
+		"device.id": clip(deviceID, 25),
 	})
 
 	cached, err := w.cache.DeviceZip(ctx, deviceID)
@@ -55,4 +56,11 @@ func (w *WriteThroughDevice) DeviceZip(ctx context.Context, accessToken, deviceI
 	}
 
 	return result, nil
+}
+
+func clip(s string, max int) string {
+	if len(s) <= max {
+		return s
+	}
+	return fmt.Sprintf("%s...", s[:max])
 }
