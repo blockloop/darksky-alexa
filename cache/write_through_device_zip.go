@@ -6,7 +6,6 @@ import (
 
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
-	"github.com/pkg/errors"
 )
 
 // WriteThroughDevice is a cache layer that has a fallback layer
@@ -44,7 +43,7 @@ func (w *WriteThroughDevice) DeviceZip(ctx context.Context, accessToken, deviceI
 
 	result, err := w.api.DeviceZip(ctx, deviceID, accessToken)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to fetch zipcode from API")
+		return "", err
 	}
 	if result != "" {
 		go func(ll log.Interface) {

@@ -68,7 +68,7 @@ func (api *Client) DeviceZip(ctx context.Context, deviceID, apiAccessToken strin
 		return "", ErrUnknownZipcode
 	default:
 		body, _ := ioutil.ReadAll(resp.Body)
-		return "", fmt.Errorf("received bad status code (%d) from alexa API: %s", resp.StatusCode, body)
+		return "", errors.Errorf("received bad status code (%d) from alexa API: %s", resp.StatusCode, body)
 	}
 
 	var res zipcodeResponse
