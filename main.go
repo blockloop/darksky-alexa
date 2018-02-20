@@ -41,7 +41,7 @@ var (
 
 func init() {
 	// not using config to avoid logging until log has been setup
-	initLogging(os.Getenv("PAPERTRAIL_DEST"))
+	initLogging(os.Getenv("PAPERTRAIL_DEST"), os.Getenv("PAPERTRAIL_HOST"))
 }
 
 func main() {
@@ -111,17 +111,24 @@ func initRedis(url string, maxIdle int) *redis.Pool {
 	return redis.NewPool(dialRedis, maxIdle)
 }
 
-func initLogging(papertrailAddr string) {
-	if papertrailAddr == "" {
+func initLogging(ptaddr, pthost string) {
+	if ptaddr == "" {
 		return
+	}
+	if pthost == "" {
+		pthost = "UNKNOWN_HOSTNAME"
+		if h, err := os.Hostname(); err != nil {
+			pthost = h
+		}
 	}
 
 	ll := log.WithFields(log.Fields{
-		"addr":      papertrailAddr,
+		"addr":      ptaddr,
+		"host":      pthost,
 		"component": "papertrail",
 	})
 
-	host, portstr, err := net.SplitHostPort(papertrailAddr)
+	host, portstr, err := net.SplitHostPort(ptaddr)
 	if err != nil || !strings.Contains(host, ".papertrailapp.com") {
 		ll.WithError(err).Fatal("invalid papertrail address should be like logs2.papertrailapp.com:33078")
 	}
@@ -131,15 +138,11 @@ func initLogging(papertrailAddr string) {
 	}
 
 	cname := strings.Split(host, ".")[0]
-	hostname, err := os.Hostname()
-	if err != nil {
-		ll.WithError(err).Info("failed to detect hostname")
-	}
 
 	conf := &papertrail.Config{
 		Host:     cname,
 		Port:     port,
-		Hostname: hostname,
+		Hostname: pthost,
 		Tag:      "darksky-alexa",
 	}
 
