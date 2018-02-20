@@ -112,15 +112,14 @@ func initRedis(url string, maxIdle int) *redis.Pool {
 }
 
 func initLogging(papertrailAddr string) {
+	if papertrailAddr == "" {
+		return
+	}
+
 	ll := log.WithFields(log.Fields{
 		"addr":      papertrailAddr,
 		"component": "papertrail",
 	})
-
-	if papertrailAddr == "" {
-		ll.Info("disabled")
-		return
-	}
 
 	host, portstr, err := net.SplitHostPort(papertrailAddr)
 	if err != nil || !strings.Contains(host, ".papertrailapp.com") {
