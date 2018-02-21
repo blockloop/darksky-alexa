@@ -21,7 +21,7 @@ type Speaker interface {
 }
 
 // All is the ordered list of speakers
-var All = []Speaker{Precipitation{}, LowHigh{}, Forecast{}, Current{}}
+var All = []Speaker{Precipitation{}, LowHigh{}, Alerts{}, Forecast{}}
 
 // Weather conditions that have been configured in the Alexa skill
 // these show up under alexa.WeatherRequest.Condition
@@ -32,6 +32,7 @@ const (
 	high        = "high"
 	snow        = "snow"
 	rain        = "rain"
+	alerts      = "alerts"
 	humidity    = "humidity"
 	forecast    = "forecast"
 	extForecast = "extended forecast"

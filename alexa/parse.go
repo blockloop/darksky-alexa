@@ -27,8 +27,8 @@ const (
 )
 
 const (
-	yyyymmdd = "2006-01-02"
-	yyyymm   = "2006-01"
+	dayFmt   = "2006-01-02"
+	monthFmt = "2006-01"
 
 	morning   = "MO"
 	afternoon = "AF"
@@ -115,13 +115,13 @@ func parseDay(day string) (ts TimeSpan) {
 	}
 
 	// try to parse simple date first
-	if simpleDay, err := time.Parse(yyyymmdd, day); err == nil {
+	if simpleDay, err := time.Parse(dayFmt, day); err == nil {
 		return TimeSpan{
 			Start: simpleDay,
 			End:   nowutil.New(simpleDay).EndOfDay(),
 		}
 	}
-	if simpleMonth, err := time.Parse(yyyymm, day); err == nil {
+	if simpleMonth, err := time.Parse(monthFmt, day); err == nil {
 		return TimeSpan{
 			Start: simpleMonth,
 			End:   nowutil.New(simpleMonth).EndOfWeek(),

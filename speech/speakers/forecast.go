@@ -87,7 +87,7 @@ func (Forecast) hourly(ts alexa.TimeSpan, forecast *darksky.Forecast) string {
 	msg := fmt.Sprintf("About %0.f° and %s", avg, dps[0].Summary)
 
 	if prec := highestChanceOfPrecipitation(dps); prec.PrecipProbability > 0.15 {
-		msg = fmt.Sprintf("%s with %s chance of %s",
+		msg = fmt.Sprintf("%s with %s of %s",
 			msg,
 			humanProbability(prec.PrecipProbability),
 			prec.PrecipType)
