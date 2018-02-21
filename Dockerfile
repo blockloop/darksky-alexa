@@ -1,4 +1,4 @@
-FROM golang:1.9
+FROM golang:1.10
 WORKDIR /go/src/github.com/blockloop/darksky-alexa
 ADD . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
