@@ -18,7 +18,7 @@ func (Precipitation) Name() string {
 }
 
 func (Precipitation) CanSpeak(q *alexa.WeatherRequest) bool {
-	return q.Condition == rain || q.Condition == snow
+	return q.Condition == condRain || q.Condition == condSnow
 }
 
 func (p Precipitation) Speak(f *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {

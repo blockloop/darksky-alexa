@@ -35,16 +35,16 @@ var All = []Speaker{
 const (
 	dayFormat = "2006-01-02"
 
-	polln       = "pollen"
-	low         = "low"
-	high        = "high"
-	snow        = "snow"
-	rain        = "rain"
-	alerts      = "alerts"
-	humidity    = "humidity"
-	forecast    = "forecast"
-	extForecast = "extended forecast"
-	temperature = "temperature"
+	condPollen      = "pollen"
+	condLow         = "low"
+	condHigh        = "high"
+	condSnow        = "snow"
+	condRain        = "rain"
+	condAlerts      = "alerts"
+	condHumidity    = "humidity"
+	condForecast    = "forecast"
+	condExtForecast = "extended forecast"
+	condTemperature = "temperature"
 )
 
 func sameWeek(a, b time.Time) bool {

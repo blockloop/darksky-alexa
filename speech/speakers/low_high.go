@@ -25,7 +25,7 @@ func (LowHigh) Name() string {
 }
 
 func (lh LowHigh) CanSpeak(q *alexa.WeatherRequest) bool {
-	return q.Condition == high || q.Condition == low
+	return q.Condition == condHigh || q.Condition == condLow
 }
 
 func (lh LowHigh) Speak(f *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
@@ -45,10 +45,10 @@ func (lh LowHigh) Speak(f *darksky.Forecast, _ *pollen.Forecast, q *alexa.Weathe
 	}
 
 	switch q.Condition {
-	case low:
+	case condLow:
 		dp := findLow(dps)
 		return fmt.Sprintf("%.0f is the %s %s", dp.TemperatureLow, q.Condition, humanDay(dp.Time.Time()))
-	case high:
+	case condHigh:
 		dp := findHigh(dps)
 		return fmt.Sprintf("%.0f is the %s %s", dp.TemperatureHigh, q.Condition, humanDay(dp.Time.Time()))
 	default:

@@ -1,9 +1,9 @@
 package speakers
 
 import (
+	"bytes"
 	"fmt"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/apex/log"
@@ -21,7 +21,7 @@ func (Alerts) Name() string {
 }
 
 func (Alerts) CanSpeak(q *alexa.WeatherRequest) bool {
-	return q.Condition == alerts
+	return q.Condition == condAlerts
 }
 
 // Speak speaks "the weather|forecast [day] [time]"
@@ -71,7 +71,7 @@ func (f Alerts) Speak(forecast *darksky.Forecast, _ *pollen.Forecast, q *alexa.W
 		}
 	}
 
-	sb := &strings.Builder{}
+	sb := bytes.NewBuffer(nil)
 	for _, msg := range hash {
 		sb.WriteString(msg)
 	}
