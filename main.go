@@ -43,6 +43,12 @@ var (
 func init() {
 	// not using config to avoid logging until log has been setup
 	initLogging(os.Getenv("PAPERTRAIL_DEST"), os.Getenv("PAPERTRAIL_HOST"))
+
+	tz, err := time.LoadLocation("America/Chicago")
+	if err != nil {
+		log.WithError(err).Fatal("failed to load timezone")
+	}
+	time.Local = tz
 }
 
 func main() {
