@@ -10,7 +10,7 @@ import (
 
 func TestParseWeek(t *testing.T) {
 	table := map[string]time.Time{
-		"2018-W1":     time.Date(2018, time.January, 1, 0, 0, 0, 0, time.Local),
+		"2018-W1":     time.Date(2017, time.December, 31, 0, 0, 0, 0, time.Local),
 		"2018-W10":    time.Date(2018, time.March, 5, 0, 0, 0, 0, time.Local),
 		"2018-W1-WE":  time.Date(2018, time.January, 6, 0, 0, 0, 0, time.Local),
 		"2018-W10-WE": time.Date(2018, time.March, 10, 0, 0, 0, 0, time.Local),
@@ -18,7 +18,7 @@ func TestParseWeek(t *testing.T) {
 
 	for k, exp := range table {
 		ts := parseWeek(k)
-		assert.Equal(t, exp.Format(yyyymmdd), ts.Start.Format(yyyymmdd), k)
+		assert.Equal(t, exp.Format(dayFmt), ts.Start.Format(dayFmt), k)
 	}
 }
 

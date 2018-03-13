@@ -8,6 +8,7 @@ import (
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 	nowutil "github.com/jinzhu/now"
 )
 
@@ -27,7 +28,7 @@ func (lh LowHigh) CanSpeak(q *alexa.WeatherRequest) bool {
 	return q.Condition == high || q.Condition == low
 }
 
-func (lh LowHigh) Speak(f *darksky.Forecast, q *alexa.WeatherRequest) string {
+func (lh LowHigh) Speak(f *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
 	if !lh.CanSpeak(q) {
 		log.Error("tried to speak low/high without asking for low/high")
 		return "a problem occurred"

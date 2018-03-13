@@ -7,13 +7,24 @@ import (
 	"time"
 
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/garyburd/redigo/redis"
 	"github.com/pkg/errors"
+)
+
+const (
+	oneDayTTL = 86400
 )
 
 // RedisPool is a pool of redis connections
 type RedisPool interface {
 	Get() redis.Conn
+}
+
+// Pollen is a layer which caches pollen count information
+type Pollen interface {
+	GetPollen(ctx context.Context, zipcode string) (*pollen.Forecast, error)
+	PutPollen(ctx context.Context, zipcode string, p *pollen.Forecast) error
 }
 
 // Forecast is a layer which caches darksky forecast results
@@ -108,6 +119,45 @@ func (c *Redis) PutForecast(ctx context.Context, lat, lon string, f *darksky.For
 	con.Send("MULTI")
 	con.Send("SET", key, encoded)
 	con.Send("EXPIRE", key, c.ttl)
+	_, err = con.Do("EXEC")
+
+	return errors.Wrap(err, "failed to set cache")
+}
+
+// GetPollen retrieves a cache forecast from the redis store. If
+// no cache exists then nil, nil is returned.
+func (c *Redis) GetPollen(ctx context.Context, zip string) (*pollen.Forecast, error) {
+	con := c.pool.Get()
+	defer con.Close()
+
+	key := fmt.Sprintf("pollen:%s", zip)
+	raw, err := redis.Bytes(con.Do("GET", key))
+	if err != nil {
+		if err == redis.ErrNil {
+			return nil, nil
+		}
+		return nil, errors.Wrap(err, "failed to get pollen")
+	}
+
+	var forecast pollen.Forecast
+	err = json.Unmarshal(raw, &forecast)
+	return &forecast, errors.Wrap(err, "failed to parse JSON from redis")
+}
+
+// PutPollen stores a forecast to the redis store
+func (c *Redis) PutPollen(ctx context.Context, zip string, f *pollen.Forecast) error {
+	con := c.pool.Get()
+	defer con.Close()
+
+	encoded, err := json.Marshal(f)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal JSON")
+	}
+
+	key := fmt.Sprintf("pollen:%s", zip)
+	con.Send("MULTI")
+	con.Send("SET", key, encoded)
+	con.Send("EXPIRE", key, oneDayTTL)
 	_, err = con.Do("EXEC")
 
 	return errors.Wrap(err, "failed to set cache")

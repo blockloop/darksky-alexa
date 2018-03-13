@@ -10,6 +10,7 @@ import (
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/geo"
+	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/blockloop/darksky-alexa/speech"
 	"github.com/blockloop/tea"
 	"github.com/pkg/errors"
@@ -24,8 +25,12 @@ type darkskyAPI interface {
 	GetForecast(ctx context.Context, lat, lon string) (*darksky.Forecast, error)
 }
 
+type pollenAPI interface {
+	GetPollen(ctx context.Context, zipcode string) (*pollen.Forecast, error)
+}
+
 // Alexa handles requests made from the Amazon Echo
-func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
+func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI, papi pollenAPI) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
 		var req alexa.Request
 		if err := tea.Body(r, &req); err != nil {
@@ -35,6 +40,12 @@ func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 			}
 			return tea.Error(400, errors.Wrap(err, "invalid request").Error())
 		}
+		ll := log.WithFields(log.Fields{
+			"condition": req.Request.Intent.Slots.Condition,
+			"day":       req.Request.Intent.Slots.Day,
+			"time":      req.Request.Intent.Slots.Time,
+		})
+		ll.Info("request")
 
 		loc := getLocation(r.Context(), &req, alexaAPI, db)
 
@@ -44,8 +55,15 @@ func Alexa(alexaAPI alexa.API, db *geo.DB, dsapi darkskyAPI) http.HandlerFunc {
 			return tea.StatusError(500)
 		}
 
+		pol, err := papi.GetPollen(r.Context(), loc.Zip)
+		if err != nil {
+			log.WithError(err).Error("failed to get pollen data")
+			return tea.StatusError(500)
+		}
+
 		q := alexa.ParseWeatherRequest(req.Request)
-		response := speech.Speak(forecast, q)
+		ll.WithField("parsed", q.String()).Info("parsed request")
+		response := speech.Speak(forecast, pol, q)
 
 		return 200, alexa.ResponseText(response)
 	}
@@ -71,7 +89,7 @@ func getLocation(ctx context.Context, req *alexa.Request, api alexa.API, db *geo
 	}
 
 	if lat, lon, ok := db.Lookup(zip); ok {
-		return location{Latitude: lat, Longitude: lon}
+		return location{Latitude: lat, Longitude: lon, Zip: zip}
 	}
 	ll.WithField("zip", zip).Error("failed to retrieve zipcode from geoDB. Using default location")
 	return defaultLocation

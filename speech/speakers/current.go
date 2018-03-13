@@ -5,6 +5,7 @@ import (
 
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 )
 
 // Current handles any request and responds with the current weather
@@ -23,11 +24,20 @@ func (Current) CanSpeak(q *alexa.WeatherRequest) bool {
 	return true
 }
 
-func (Current) Speak(f *darksky.Forecast, _ *alexa.WeatherRequest) string {
-	return fmt.Sprintf("It's currently %.0f° and %s with a high of %.0f and a low of %.0f",
+func (Current) Speak(f *darksky.Forecast, pol *pollen.Forecast, _ *alexa.WeatherRequest) string {
+	var pc pollen.DataPoint
+	for _, point := range pol.DataPoints {
+		if today(point.Day) {
+			pc = point
+			break
+		}
+	}
+
+	return fmt.Sprintf("It's currently %.0f° and %s with a high of %.0f and a low of %.0f. Pollen is %s",
 		f.Hourly.Data[0].Temperature,
 		f.Currently.Summary,
 		f.Daily.Data[0].TemperatureHigh,
 		f.Daily.Data[0].TemperatureLow,
+		humanPollen(pc.Index),
 	)
 }

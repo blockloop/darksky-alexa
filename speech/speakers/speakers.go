@@ -7,6 +7,7 @@ import (
 	timeclock "github.com/benbjohnson/clock"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 )
 
 var clock = timeclock.New()
@@ -16,18 +17,25 @@ var NoData = "I don't have any forecast information for that time"
 
 type Speaker interface {
 	CanSpeak(*alexa.WeatherRequest) bool
-	Speak(*darksky.Forecast, *alexa.WeatherRequest) string
+	Speak(*darksky.Forecast, *pollen.Forecast, *alexa.WeatherRequest) string
 	Name() string
 }
 
 // All is the ordered list of speakers
-var All = []Speaker{Precipitation{}, LowHigh{}, Alerts{}, Forecast{}}
+var All = []Speaker{
+	Pollen{},
+	Precipitation{},
+	LowHigh{},
+	Alerts{},
+	Forecast{},
+}
 
 // Weather conditions that have been configured in the Alexa skill
 // these show up under alexa.WeatherRequest.Condition
 const (
 	dayFormat = "2006-01-02"
 
+	polln       = "pollen"
 	low         = "low"
 	high        = "high"
 	snow        = "snow"
@@ -109,4 +117,20 @@ func humanProbability(percent float64) string {
 		return "a slight chance"
 	}
 	return "no chance"
+}
+
+func humanPollen(index float64) string {
+	if index < 2.5 {
+		return "low"
+	}
+	if index < 4.9 {
+		return "low-medium"
+	}
+	if index < 7.2 {
+		return "medium"
+	}
+	if index < 9.7 {
+		return "medium-high"
+	}
+	return "high"
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 )
 
 // Nop is a cache that does nothing
@@ -23,5 +24,13 @@ func (n *Nop) DeviceZip(ctx context.Context, deviceID string) (string, error) {
 }
 
 func (n *Nop) PutDeviceZip(ctx context.Context, deviceID string, zip string) error {
+	return nil
+}
+
+func (n *Nop) GetPollen(ctx context.Context, zip string) (*pollen.Forecast, error) {
+	return nil, nil
+}
+
+func (n *Nop) PutPollen(ctx context.Context, zip string, p *pollen.Forecast) error {
 	return nil
 }

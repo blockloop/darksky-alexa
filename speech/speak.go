@@ -4,6 +4,7 @@ import (
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/blockloop/darksky-alexa/speech/speakers"
 )
 
@@ -15,7 +16,7 @@ var Default = speakers.Current{}.Speak
 //
 // if the question is "will it rain tomorrow?" then the response should
 // respond with yes or no and the time it is expected to rain
-func Speak(forecast *darksky.Forecast, q alexa.WeatherRequest) string {
+func Speak(weather *darksky.Forecast, pol *pollen.Forecast, q alexa.WeatherRequest) string {
 	ll := log.WithFields(log.Fields{
 		"query.condition": q.Condition,
 		"query.end":       q.End,
@@ -27,9 +28,9 @@ func Speak(forecast *darksky.Forecast, q alexa.WeatherRequest) string {
 			continue
 		}
 		ll.WithField("speaker", speaker.Name()).Info("speaking")
-		return speaker.Speak(forecast, &q)
+		return speaker.Speak(weather, pol, &q)
 	}
 
 	ll.Warn("No speaker was found. Falling back to default.")
-	return Default(forecast, &q)
+	return Default(weather, pol, &q)
 }

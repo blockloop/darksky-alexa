@@ -13,6 +13,7 @@ import (
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/geo"
 	"github.com/blockloop/darksky-alexa/handlers"
+	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/blockloop/darksky-alexa/ratelimiter"
 
 	"github.com/alicebob/miniredis"
@@ -81,9 +82,10 @@ func main() {
 
 	mux.Get("/ping", handlers.Ping)
 
-	mux.With(
-		ratelimiter.New(redisPool, config.RequestsPerDay, config.IPRequestsPerDay),
-	).Post("/darksky", handlers.Alexa(alexaAPI, geodb, cachedDarksky))
+	rl := ratelimiter.New(redisPool, config.RequestsPerDay, config.IPRequestsPerDay)
+	mux.With(rl).Post("/darksky",
+		handlers.Alexa(alexaAPI, geodb, cachedDarksky, pollen.NewAPI()),
+	)
 
 	addr := ":3000"
 	log.WithField("addr", addr).Info("server started")

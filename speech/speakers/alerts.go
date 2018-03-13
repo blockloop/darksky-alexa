@@ -9,6 +9,7 @@ import (
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
+	"github.com/blockloop/darksky-alexa/pollen"
 )
 
 const noAlerts = "there are no active alerts"
@@ -24,7 +25,7 @@ func (Alerts) CanSpeak(q *alexa.WeatherRequest) bool {
 }
 
 // Speak speaks "the weather|forecast [day] [time]"
-func (f Alerts) Speak(forecast *darksky.Forecast, q *alexa.WeatherRequest) string {
+func (f Alerts) Speak(forecast *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
 	if !f.CanSpeak(q) {
 		log.Error("attempted to speak Alerts without checking CanSpeak first")
 		return "a problem occured"
