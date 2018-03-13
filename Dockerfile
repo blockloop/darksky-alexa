@@ -1,4 +1,7 @@
 FROM golang:1.10
+ENV TZ=America/Chicago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 WORKDIR /go/src/github.com/blockloop/darksky-alexa
 ADD . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
