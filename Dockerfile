@@ -4,7 +4,7 @@ ADD . .
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o app .
 
 FROM ubuntu:bionic
-RUN apt-get update && apt-get install -y ca-certificates sqlite3
+RUN apt-get update && apt-get install -y ca-certificates sqlite3 tzdata
 EXPOSE 3000
 RUN mkdir /app
 WORKDIR /root/
