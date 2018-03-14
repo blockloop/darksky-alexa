@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/apex/log"
+	"github.com/blockloop/darksky-alexa/tz"
 	"github.com/pkg/errors"
 )
 
@@ -27,8 +28,8 @@ func NewAPI() *API {
 	}
 }
 
-func (api *API) GetPollen(ctx context.Context, zipcode string) (*Forecast, error) {
-	url := fmt.Sprintf(apiurlFmt, zipcode)
+func (api *API) GetPollen(ctx context.Context, loc *tz.Location) (*Forecast, error) {
+	url := fmt.Sprintf(apiurlFmt, loc.Zipcode)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -51,7 +52,7 @@ func (api *API) GetPollen(ctx context.Context, zipcode string) (*Forecast, error
 
 	f := &Forecast{
 		Location: Location{
-			Zip:   zipcode,
+			Zip:   loc.Zipcode,
 			City:  res.Location.City,
 			State: res.Location.State,
 		},
@@ -60,7 +61,7 @@ func (api *API) GetPollen(ctx context.Context, zipcode string) (*Forecast, error
 
 	for i, p := range res.Location.Periods {
 		period := p.Period
-		date, err := time.Parse("2006-01-02", strings.Split(period, "T")[0])
+		date, err := time.ParseInLocation("2006-01-02", strings.Split(period, "T")[0], loc.Timezone)
 		if err != nil {
 			log.WithField("raw", period).
 				WithError(err).

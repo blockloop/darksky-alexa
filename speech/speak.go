@@ -1,11 +1,13 @@
 package speech
 
 import (
-	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/blockloop/darksky-alexa/speech/speakers"
+	"github.com/blockloop/darksky-alexa/tz"
+
+	"github.com/apex/log"
 )
 
 // Default speaks the default message
@@ -16,7 +18,7 @@ var Default = speakers.Current{}.Speak
 //
 // if the question is "will it rain tomorrow?" then the response should
 // respond with yes or no and the time it is expected to rain
-func Speak(weather *darksky.Forecast, pol *pollen.Forecast, q alexa.WeatherRequest) string {
+func Speak(loc *tz.Location, weather *darksky.Forecast, pol *pollen.Forecast, q alexa.WeatherRequest) string {
 	ll := log.WithFields(log.Fields{
 		"query.condition": q.Condition,
 		"query.end":       q.End,
@@ -28,9 +30,9 @@ func Speak(weather *darksky.Forecast, pol *pollen.Forecast, q alexa.WeatherReque
 			continue
 		}
 		ll.WithField("speaker", speaker.Name()).Info("speaking")
-		return speaker.Speak(weather, pol, &q)
+		return speaker.Speak(loc, weather, pol, &q)
 	}
 
 	ll.Warn("No speaker was found. Falling back to default.")
-	return Default(weather, pol, &q)
+	return Default(loc, weather, pol, &q)
 }

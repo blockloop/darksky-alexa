@@ -6,6 +6,7 @@ import (
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
+	"github.com/blockloop/darksky-alexa/tz"
 )
 
 // Pollen responds to the following queries
@@ -20,7 +21,7 @@ func (Pollen) CanSpeak(q *alexa.WeatherRequest) bool {
 	return q.Condition == condPollen
 }
 
-func (p Pollen) Speak(_ *darksky.Forecast, pf *pollen.Forecast, q *alexa.WeatherRequest) string {
+func (p Pollen) Speak(loc *tz.Location, _ *darksky.Forecast, pf *pollen.Forecast, q *alexa.WeatherRequest) string {
 	for _, dp := range pf.DataPoints {
 		if sameDay(dp.Day, q.Start) {
 			return fmt.Sprintf("Pollen is %s %s",

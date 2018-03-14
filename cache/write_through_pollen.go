@@ -5,6 +5,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/blockloop/darksky-alexa/pollen"
+	"github.com/blockloop/darksky-alexa/tz"
 	"github.com/pkg/errors"
 )
 
@@ -25,15 +26,15 @@ func NewWriteThroughPollen(cache Pollen, api *pollen.API) *WriteThroughPollen {
 // GetPollen first tries to retrieve a cached result and falls back to
 // directly fetching to the API. If the API is used then results are
 // stored in the cache store
-func (w *WriteThroughPollen) GetPollen(ctx context.Context, zipcode string) (*pollen.Forecast, error) {
+func (w *WriteThroughPollen) GetPollen(ctx context.Context, loc *tz.Location) (*pollen.Forecast, error) {
 	ll := log.WithFields(log.Fields{
-		"component": "forecastcache",
-		"zip":       zipcode,
+		"component": "pollencache",
+		"zip":       loc.Zipcode,
 	})
 
-	forecast, err := w.cache.GetPollen(ctx, zipcode)
+	forecast, err := w.cache.GetPollen(ctx, loc.Zipcode)
 	if err != nil {
-		ll.WithError(err).Error("failed to get cached forecast")
+		ll.WithError(err).Error("failed to get cached pollen")
 	}
 	if forecast != nil {
 		ll.Info("cache hit")
@@ -41,13 +42,13 @@ func (w *WriteThroughPollen) GetPollen(ctx context.Context, zipcode string) (*po
 	}
 	ll.Info("cache miss")
 
-	forecast, err = w.api.GetPollen(ctx, zipcode)
+	forecast, err = w.api.GetPollen(ctx, loc)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to fetch forecast from API")
+		return nil, errors.Wrap(err, "failed to fetch pollen from API")
 	}
 	if forecast != nil {
 		go func(ll log.Interface) {
-			err := w.cache.PutPollen(context.Background(), zipcode, forecast)
+			err := w.cache.PutPollen(context.Background(), loc.Zipcode, forecast)
 			if err != nil {
 				ll.WithError(err).Error("failed to put cache")
 			}

@@ -8,6 +8,7 @@ import (
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
+	"github.com/blockloop/darksky-alexa/tz"
 )
 
 var clock = timeclock.New()
@@ -17,7 +18,7 @@ var NoData = "I don't have any forecast information for that time"
 
 type Speaker interface {
 	CanSpeak(*alexa.WeatherRequest) bool
-	Speak(*darksky.Forecast, *pollen.Forecast, *alexa.WeatherRequest) string
+	Speak(*tz.Location, *darksky.Forecast, *pollen.Forecast, *alexa.WeatherRequest) string
 	Name() string
 }
 
@@ -54,14 +55,15 @@ func sameWeek(a, b time.Time) bool {
 }
 
 func sameDay(a, b time.Time, times ...time.Time) bool {
-	afmt, bfmt := a.Format(dayFormat), b.Format(dayFormat)
-
-	if afmt != bfmt {
+	y1, m1, d1 := a.Date()
+	y2, m2, d2 := b.Date()
+	if y1 != y2 || m1 != m2 || d1 != d2 {
 		return false
 	}
 
 	for _, t := range times {
-		if t.Format(dayFormat) != afmt {
+		y2, m2, d2 = t.Date()
+		if y1 != y2 || m1 != m2 || d1 != d2 {
 			return false
 		}
 	}
@@ -73,7 +75,7 @@ func today(b time.Time) bool {
 }
 
 func sameHour(a, b time.Time) bool {
-	return a.Format("2006-01-02 15") == b.Format("2006-01-02 15")
+	return a.Truncate(time.Hour) == b.Truncate(time.Hour)
 }
 
 func humanDay(day time.Time) string {

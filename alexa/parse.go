@@ -38,21 +38,21 @@ const (
 )
 
 // ParseWeatherRequest parses the RequestBody as a WeatherRequest
-func ParseWeatherRequest(r RequestBody) WeatherRequest {
+func ParseWeatherRequest(r RequestBody, loc *time.Location) WeatherRequest {
 	slots := r.Intent.Slots
 	res := WeatherRequest{
 		Condition: slots.Condition.Value,
 	}
 
-	res.TimeSpan = parseDuration(slots.Time.Value, slots.Day.Value)
+	res.TimeSpan = parseDuration(slots.Time.Value, slots.Day.Value, loc)
 	return res
 }
 
-func parseDuration(timeofday, day string) TimeSpan {
-	ts := parseDay(day)
+func parseDuration(timeofday, day string, loc *time.Location) TimeSpan {
+	ts := parseDay(day, loc)
 	if timeofday != "" {
 		hour, span := parseTime(timeofday)
-		ts.Start = time.Date(ts.Start.Year(), ts.Start.Month(), ts.Start.Day(), hour, 0, 0, 0, time.Local)
+		ts.Start = time.Date(ts.Start.Year(), ts.Start.Month(), ts.Start.Day(), hour, 0, 0, 0, loc)
 		ts.End = ts.Start.Add(span)
 	}
 	return ts
@@ -103,7 +103,7 @@ func parseTime(s string) (hour int, dur time.Duration) {
 // and a season indicator: winter: WI, spring: SP, summer: SU, fall: FA)
 //
 // https://developer.amazon.com/docs/custom-skills/slot-type-reference.html#date
-func parseDay(day string) (ts TimeSpan) {
+func parseDay(day string, loc *time.Location) (ts TimeSpan) {
 	tnow := time.Now()
 	now := TimeSpan{
 		Start: tnow,
@@ -115,20 +115,20 @@ func parseDay(day string) (ts TimeSpan) {
 	}
 
 	// try to parse simple date first
-	if simpleDay, err := time.Parse(dayFmt, day); err == nil {
+	if simpleDay, err := time.ParseInLocation(dayFmt, day, loc); err == nil {
 		return TimeSpan{
 			Start: simpleDay,
 			End:   nowutil.New(simpleDay).EndOfDay(),
 		}
 	}
-	if simpleMonth, err := time.Parse(monthFmt, day); err == nil {
+	if simpleMonth, err := time.ParseInLocation(monthFmt, day, loc); err == nil {
 		return TimeSpan{
 			Start: simpleMonth,
 			End:   nowutil.New(simpleMonth).EndOfWeek(),
 		}
 	}
 
-	if week := parseWeek(day); !week.IsZero() {
+	if week := parseWeek(day, loc); !week.IsZero() {
 		return week
 	}
 
@@ -136,7 +136,7 @@ func parseDay(day string) (ts TimeSpan) {
 	return now
 }
 
-func parseWeek(s string) TimeSpan {
+func parseWeek(s string, loc *time.Location) TimeSpan {
 	items := weekRegex.FindStringSubmatch(s)
 	// no match
 	if len(items) == 0 || items[0] == "" {
@@ -148,7 +148,7 @@ func parseWeek(s string) TimeSpan {
 	zweek = zweek - 1
 	weekend := items[3] != ""
 
-	week := nowutil.New(time.Date(year, time.January, 1, 0, 0, 0, 1, time.Local))
+	week := nowutil.New(time.Date(year, time.January, 1, 0, 0, 0, 1, loc))
 	if zweek > 0 {
 		week = nowutil.New(week.AddDate(0, 0, zweek*7))
 	}

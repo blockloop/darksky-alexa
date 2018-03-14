@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"net"
 	"net/http"
 	"os"
@@ -26,19 +27,20 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/render"
 	"github.com/pkg/errors"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
-var (
-	config = struct {
-		DarkskyToken     string `env:"DARKSKY_TOKEN,required"`
-		RedisURL         string `env:"REDIS_URL"`
-		RedisMaxIdle     int    `env:"REDIS_MAX_IDLE" envDefault:"5"`
-		Port             int    `env:"PORT", envDefault:"3000"`
-		RequestsPerDay   int64  `env:"REQUESTS_PER_DAY" envDefault:"1000"`
-		IPRequestsPerDay int64  `env:"IP_REQUESTS_PER_DAY" envDefault:"50"`
-		MockZipcode      string `env:"MOCK_ZIP_CODE"`
-	}{}
-)
+var config = struct {
+	DarkskyToken     string `env:"DARKSKY_TOKEN,required"`
+	RedisURL         string `env:"REDIS_URL"`
+	RedisMaxIdle     int    `env:"REDIS_MAX_IDLE" envDefault:"5"`
+	Port             int    `env:"PORT", envDefault:"3000"`
+	RequestsPerDay   int64  `env:"REQUESTS_PER_DAY" envDefault:"1000"`
+	IPRequestsPerDay int64  `env:"IP_REQUESTS_PER_DAY" envDefault:"50"`
+	MockZipcode      string `env:"MOCK_ZIP_CODE"`
+	GeoDBDSN         string `env:"GEODB_DSN", envDefault:"geodb.sqlite"`
+}{}
 
 func init() {
 	// not using config to avoid logging until log has been setup
@@ -65,10 +67,17 @@ func main() {
 	redisPool := initRedis(config.RedisURL, config.RedisMaxIdle)
 	defer redisPool.Close()
 
-	geodb := geo.New(redisPool)
+	gdb, err := sql.Open("sqlite3", config.GeoDBDSN)
+	if err != nil {
+		log.WithError(err).Fatal("failed to load geodb")
+	}
+	defer gdb.Close()
+	geodb := geo.New(gdb)
+
 	dsapi := darksky.New(config.DarkskyToken)
 	redisCache := cache.NewRedis(redisPool)
 	cachedDarksky := cache.NewWriteThroughForecast(redisCache, dsapi)
+	pollenAPI := cache.NewWriteThroughPollen(redisCache, pollen.NewAPI())
 	alexaAPI := initAlexaAPI(redisCache, config.MockZipcode)
 
 	mux := chi.NewMux()
@@ -84,7 +93,7 @@ func main() {
 
 	rl := ratelimiter.New(redisPool, config.RequestsPerDay, config.IPRequestsPerDay)
 	mux.With(rl).Post("/darksky",
-		handlers.Alexa(alexaAPI, geodb, cachedDarksky, pollen.NewAPI()),
+		handlers.Alexa(alexaAPI, geodb, cachedDarksky, pollenAPI),
 	)
 
 	addr := ":3000"

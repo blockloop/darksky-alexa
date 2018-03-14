@@ -7,6 +7,7 @@ import (
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
+	"github.com/blockloop/darksky-alexa/tz"
 )
 
 // Precipitation responds to the following queries
@@ -21,7 +22,7 @@ func (Precipitation) CanSpeak(q *alexa.WeatherRequest) bool {
 	return q.Condition == condRain || q.Condition == condSnow
 }
 
-func (p Precipitation) Speak(f *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
+func (p Precipitation) Speak(loc *tz.Location, f *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
 	dps := p.dataPoints(&q.TimeSpan, f)
 	if len(dps) == 0 {
 		return NoData

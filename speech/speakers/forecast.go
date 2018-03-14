@@ -10,6 +10,7 @@ import (
 	"github.com/blockloop/darksky-alexa/alexa"
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
+	"github.com/blockloop/darksky-alexa/tz"
 
 	nowutil "github.com/jinzhu/now"
 )
@@ -25,7 +26,7 @@ func (Forecast) CanSpeak(*alexa.WeatherRequest) bool {
 }
 
 // Speak speaks "the weather|forecast [day] [time]"
-func (f Forecast) Speak(forecast *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
+func (f Forecast) Speak(loc *tz.Location, forecast *darksky.Forecast, _ *pollen.Forecast, q *alexa.WeatherRequest) string {
 	now := time.Now()
 	dur := q.End.Sub(q.Start)
 
