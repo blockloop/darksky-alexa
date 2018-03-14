@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/Masterminds/squirrel"
+  packages = ["."]
+  revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
+  version = "v1.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/alicebob/gopher-json"
   packages = ["."]
@@ -107,6 +113,24 @@
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/lann/builder"
+  packages = ["."]
+  revision = "1b87b36280d04fe7882d1512bf038ea2967ad534"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lann/ps"
+  packages = ["."]
+  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
+
+[[projects]]
+  name = "github.com/mattn/go-sqlite3"
+  packages = ["."]
+  revision = "6c771bb9887719704b210e87e934f08be014bdb1"
+  version = "v1.6.0"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
@@ -120,10 +144,7 @@
 
 [[projects]]
   name = "github.com/stretchr/testify"
-  packages = [
-    "assert",
-    "require"
-  ]
+  packages = ["assert"]
   revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
   version = "v1.2.1"
 
@@ -147,6 +168,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "430b562748aace5899fa27cd3b581c4e81d58b87c7d7160cf960f000ab4fb633"
+  inputs-digest = "12da806a62a5c901a8235ad462bd21c1442e0fbbddfd9d0692329895a2cd136b"
   solver-name = "gps-cdcl"
   solver-version = 1
