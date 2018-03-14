@@ -7,6 +7,7 @@ import (
 
 	timeclock "github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHumanDayTable(t *testing.T) {
@@ -28,4 +29,16 @@ func TestHumanDayTable(t *testing.T) {
 		assert.Equal(t, expected, humanDay(test), fmt.Sprintf("test #%d", i))
 		i++
 	}
+}
+
+func TestSameDayReturnsTrueWhenDifferentTimezone(t *testing.T) {
+	cdt, err := time.LoadLocation("America/Chicago")
+	require.NoError(t, err)
+
+	thetime, err := time.ParseInLocation(time.RFC3339, "2018-03-13T22:00:00-05:00", cdt)
+	require.NoError(t, err)
+
+	utc := thetime.UTC()
+
+	assert.Truef(t, sameDay(thetime, utc), "%s == %s", thetime, utc)
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/blockloop/darksky-alexa/darksky"
 	"github.com/blockloop/darksky-alexa/pollen"
 	"github.com/blockloop/darksky-alexa/tz"
+	nowutil "github.com/jinzhu/now"
 )
 
 var clock = timeclock.New()
@@ -55,15 +56,13 @@ func sameWeek(a, b time.Time) bool {
 }
 
 func sameDay(a, b time.Time, times ...time.Time) bool {
-	y1, m1, d1 := a.Date()
-	y2, m2, d2 := b.Date()
-	if y1 != y2 || m1 != m2 || d1 != d2 {
+	bod := nowutil.New(a.UTC()).BeginningOfDay()
+	if bod != nowutil.New(b.UTC()).BeginningOfDay() {
 		return false
 	}
 
 	for _, t := range times {
-		y2, m2, d2 = t.Date()
-		if y1 != y2 || m1 != m2 || d1 != d2 {
+		if bod != nowutil.New(t.UTC()).BeginningOfDay() {
 			return false
 		}
 	}
@@ -72,10 +71,6 @@ func sameDay(a, b time.Time, times ...time.Time) bool {
 
 func today(b time.Time) bool {
 	return sameDay(clock.Now(), b)
-}
-
-func sameHour(a, b time.Time) bool {
-	return a.Truncate(time.Hour) == b.Truncate(time.Hour)
 }
 
 func humanDay(day time.Time) string {
@@ -92,20 +87,6 @@ func humanDay(day time.Time) string {
 	}
 	return day.Format("Monday, Jan _2")
 
-}
-
-func timeOfDay(t time.Time) string {
-	hour := t.Hour()
-	if hour <= 11 {
-		return "morning"
-	}
-	if hour <= 17 {
-		return "afternoon"
-	}
-	if hour <= 20 {
-		return "evening"
-	}
-	return "night"
 }
 
 func humanProbability(percent float64) string {
