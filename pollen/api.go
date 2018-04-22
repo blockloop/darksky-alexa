@@ -29,6 +29,7 @@ func NewAPI() *API {
 }
 
 func (api *API) GetPollen(ctx context.Context, loc *tz.Location) (*Forecast, error) {
+	return nil, nil
 	url := fmt.Sprintf(apiurlFmt, loc.Zipcode)
 
 	req, err := http.NewRequest("GET", url, nil)
