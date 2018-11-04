@@ -2,175 +2,256 @@
 
 
 [[projects]]
+  digest = "1:3ca2109e48660e527509b433c4efb5b910e5b9010d5149a6f44137d47b7970ca"
   name = "github.com/Masterminds/squirrel"
   packages = ["."]
+  pruneopts = "UT"
   revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
   version = "v1.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:7afff364b8e5e9f1085fe77ae5630b8e0f7482338a50535881aa0b433e48fb0b"
   name = "github.com/alicebob/gopher-json"
   packages = ["."]
+  pruneopts = "UT"
   revision = "5a6b3ba71ee69b77cf64febf8b5a7526ca5eaef0"
 
 [[projects]]
+  digest = "1:92eb4e53319e71144d59410f1c2c393acd4fd96df71f3e1a457a8d0e9e69d99d"
   name = "github.com/alicebob/miniredis"
   packages = [
     ".",
-    "server"
+    "server",
   ]
+  pruneopts = "UT"
   revision = "9d52b1fc8da9c42dae29127fdc6f795ddcd4810f"
   version = "2.3.2"
 
 [[projects]]
+  digest = "1:256040d4888dcbb9aeb78072fef4402eb61f6b9bb48356e380c891cd51cdd68d"
   name = "github.com/apex/log"
   packages = [
     ".",
-    "handlers/papertrail"
+    "handlers/papertrail",
   ]
+  pruneopts = "UT"
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
   version = "v1.0.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:0ad5484a25fbd88409bae8b8b19134135fe73d3cb00e45d3255280b2ab975fcc"
   name = "github.com/benbjohnson/clock"
   packages = ["."]
+  pruneopts = "UT"
   revision = "7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19"
 
 [[projects]]
   branch = "master"
+  digest = "1:504c396b6602c3e458c7a79b70993492ebe6c2ea0560ac2c05b10b33ab4e8292"
   name = "github.com/blockloop/tea"
   packages = ["."]
+  pruneopts = "UT"
   revision = "246ee39990da57bcb2773211f6d0f593d88145b6"
 
 [[projects]]
+  digest = "1:a0c0204285adc9c6764284233f9f66737623801b224144797db8194e651ece8c"
   name = "github.com/caarlos0/env"
   packages = ["."]
+  pruneopts = "UT"
   revision = "7cd7992b3bc86f920394f8de92c13900da1a46b7"
   version = "v3.2.0"
 
 [[projects]]
+  digest = "1:a2c1d0e43bd3baaa071d1b9ed72c27d78169b2b269f71c105ac4ba34b1be4a39"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
+  pruneopts = "UT"
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:d28347c2e8e3b4db1dc17f8188d997402c59ad85bd33288b5b92515d6d89d072"
   name = "github.com/garyburd/redigo"
   packages = [
     "internal",
-    "redis"
+    "redis",
   ]
+  pruneopts = "UT"
   revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
   version = "v1.4.0"
 
 [[projects]]
+  digest = "1:4eda9f7bf70f5145b3b9ed3f18ac93e9b1a0e38906eb69e526380c34861e2b07"
   name = "github.com/go-chi/chi"
   packages = [
     ".",
-    "middleware"
+    "middleware",
   ]
+  pruneopts = "UT"
   revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
   version = "v3.3.2"
 
 [[projects]]
+  digest = "1:54d7b4b9ab2bb2bae35b55eea900bc8fe15cba05a95fc78bf7fd7b82a9a07afa"
   name = "github.com/go-chi/render"
   packages = ["."]
-  revision = "9f855fadd4b8cde7773f9ef51f6b2705af239519"
-  version = "v1.0.0"
+  pruneopts = "UT"
+  revision = "3215478343fbc559bd3fc08f7031bb134d6bdad5"
+  version = "v1.0.1"
 
 [[projects]]
+  digest = "1:31a18dae27a29aa074515e43a443abfd2ba6deb6d69309d8d7ce789c45f34659"
   name = "github.com/go-logfmt/logfmt"
   packages = ["."]
+  pruneopts = "UT"
   revision = "390ab7935ee28ec6b286364bba9b4dd6410cb3d5"
   version = "v0.3.0"
 
 [[projects]]
+  digest = "1:c42f32253560d1527291221734a9b0d9f20ace8ad076398c86b4e8cb59a72307"
   name = "github.com/go-playground/locales"
   packages = [
     ".",
-    "currency"
+    "currency",
   ]
+  pruneopts = "UT"
   revision = "e4cbcb5d0652150d40ad0646651076b6bd2be4f6"
   version = "v0.11.2"
 
 [[projects]]
+  digest = "1:e022cf244bcac1b6ef933f1a2e0adcf6a6dfd7b872d8d41e4d4179bb09a87cbc"
   name = "github.com/go-playground/universal-translator"
   packages = ["."]
+  pruneopts = "UT"
   revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
   version = "v0.16.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:8b0c20da64ef9616836d95d36c1b2fddd26f7c6d75d42b3da1592f1cad428e3d"
   name = "github.com/jinzhu/now"
   packages = ["."]
+  pruneopts = "UT"
   revision = "d939ba741945c047cac69c329c5fb0d6b4a06520"
 
 [[projects]]
   branch = "master"
+  digest = "1:a64e323dc06b73892e5bb5d040ced475c4645d456038333883f58934abbf6f72"
   name = "github.com/kr/logfmt"
   packages = ["."]
+  pruneopts = "UT"
   revision = "b84e30acd515aadc4b783ad4ff83aff3299bdfe0"
 
 [[projects]]
   branch = "master"
+  digest = "1:316d80e40d578fd549c122a1255bfd7ba2758bc25dc04a93ef230d61ab9c66a2"
   name = "github.com/lann/builder"
   packages = ["."]
+  pruneopts = "UT"
   revision = "1b87b36280d04fe7882d1512bf038ea2967ad534"
 
 [[projects]]
   branch = "master"
+  digest = "1:225499d25a9f1486f3b77cdc4f7d6590c506c3839bb9d8497113f6d19676d54a"
   name = "github.com/lann/ps"
   packages = ["."]
+  pruneopts = "UT"
   revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
 
 [[projects]]
+  digest = "1:ee0845ea64262e3d1a6e2eab768fcb2008a0c8e571b7a3bebea554a1c031aeeb"
   name = "github.com/mattn/go-sqlite3"
   packages = ["."]
+  pruneopts = "UT"
   revision = "6c771bb9887719704b210e87e934f08be014bdb1"
   version = "v1.6.0"
 
 [[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
+  pruneopts = "UT"
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
 
 [[projects]]
+  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
   name = "github.com/pmezard/go-difflib"
   packages = ["difflib"]
+  pruneopts = "UT"
   revision = "792786c7400a136282c1664665ae0a8db921c6c2"
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:7e8d267900c7fa7f35129a2a37596e38ed0f11ca746d6d9ba727980ee138f9f6"
   name = "github.com/stretchr/testify"
   packages = [
     "assert",
-    "require"
+    "require",
   ]
+  pruneopts = "UT"
   revision = "12b6f73e6084dad08a7c6e575284b177ecafbc71"
   version = "v1.2.1"
 
 [[projects]]
   branch = "master"
+  digest = "1:063c5099f2d46fffcd8054c9845ca7d4f8a4d07d6a83ef3a37073dcb289a5545"
   name = "github.com/yuin/gopher-lua"
   packages = [
     ".",
     "ast",
     "parse",
-    "pm"
+    "pm",
   ]
+  pruneopts = "UT"
   revision = "7d7bc8747e3f614c5c587729a341fe7d8903cdb8"
 
 [[projects]]
+  digest = "1:e3ef5236ce976857a3e4386ad747d8ec95a027e902fc41c9601e94372c465d81"
   name = "gopkg.in/go-playground/validator.v9"
   packages = ["."]
+  pruneopts = "UT"
   revision = "3620d3c0694119b61c72071ff5a05a976e97b05a"
   version = "v9.9.4"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ae2601f691d081e0d06596805ddc590078213ac94aad44a365d2ee8486d2b042"
+  input-imports = [
+    "github.com/Masterminds/squirrel",
+    "github.com/alicebob/gopher-json",
+    "github.com/alicebob/miniredis",
+    "github.com/alicebob/miniredis/server",
+    "github.com/apex/log",
+    "github.com/apex/log/handlers/papertrail",
+    "github.com/benbjohnson/clock",
+    "github.com/blockloop/tea",
+    "github.com/caarlos0/env",
+    "github.com/davecgh/go-spew/spew",
+    "github.com/garyburd/redigo/redis",
+    "github.com/go-chi/chi",
+    "github.com/go-chi/chi/middleware",
+    "github.com/go-chi/render",
+    "github.com/go-logfmt/logfmt",
+    "github.com/go-playground/locales",
+    "github.com/go-playground/locales/currency",
+    "github.com/go-playground/universal-translator",
+    "github.com/jinzhu/now",
+    "github.com/kr/logfmt",
+    "github.com/lann/builder",
+    "github.com/lann/ps",
+    "github.com/mattn/go-sqlite3",
+    "github.com/pkg/errors",
+    "github.com/pmezard/go-difflib/difflib",
+    "github.com/stretchr/testify/assert",
+    "github.com/stretchr/testify/require",
+    "github.com/yuin/gopher-lua",
+    "github.com/yuin/gopher-lua/ast",
+    "github.com/yuin/gopher-lua/parse",
+    "github.com/yuin/gopher-lua/pm",
+    "gopkg.in/go-playground/validator.v9",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
