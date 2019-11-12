@@ -41,11 +41,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:0ad5484a25fbd88409bae8b8b19134135fe73d3cb00e45d3255280b2ab975fcc"
+  digest = "1:9f6c1afe9465a11bd2481f15ea2d352ece7b5abc3868dd9fa07bb2355df96f8f"
   name = "github.com/benbjohnson/clock"
   packages = ["."]
   pruneopts = "UT"
-  revision = "7dc76406b6d3c05b5f71a86293cbcf3c4ea03b19"
+  revision = "1c0be5eba75f3e83534ae64bfa27e2d8d9acd1ad"
 
 [[projects]]
   branch = "master"
